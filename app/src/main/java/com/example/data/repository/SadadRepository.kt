@@ -1,11 +1,7 @@
 package com.example.data.repository
 
-import com.example.data.db.CustomerDao
 import com.example.data.db.MerchantDao
 import com.example.data.db.TransactionDao
-import com.example.data.model.Customer
-import com.example.data.model.LedgerEntry
-import com.example.data.model.LedgerType
 import com.example.data.model.MerchantProfile
 import com.example.data.model.ServiceType
 import com.example.data.model.TransactionRecord
@@ -31,13 +27,11 @@ data class BillInquiryResult(
 
 class SadadRepository(
     private val merchantDao: MerchantDao,
-    private val transactionDao: TransactionDao,
-    private val customerDao: CustomerDao
+    private val transactionDao: TransactionDao
 ) {
 
     val merchantProfile: Flow<MerchantProfile?> = merchantDao.getMerchantProfile()
     val allTransactions: Flow<List<TransactionRecord>> = transactionDao.getAllTransactions()
-    val allCustomers: Flow<List<Customer>> = customerDao.getAllCustomers()
 
     suspend fun ensureInitialMerchantProfile() {
         var profile = merchantDao.getMerchantSync()
@@ -68,24 +62,6 @@ class SadadRepository(
                 timestamp = System.currentTimeMillis() - 3600000
             )
             transactionDao.insertTransaction(t1)
-
-            // Seed sample customers
-            val c1Id = customerDao.insertCustomer(
-                Customer(name = "أحمد علي العبسي", phone = "773112233", totalDebt = 4500.0, notes = "عميل محل سابق")
-            )
-            customerDao.insertLedgerEntry(
-                LedgerEntry(
-                    customerId = c1Id,
-                    amount = 4500.0,
-                    type = LedgerType.DEBIT,
-                    description = "تعبئة رصيد يمن موبايل 4500 ريال آجل",
-                    balanceAfter = 4500.0
-                )
-            )
-
-            val c2Id = customerDao.insertCustomer(
-                Customer(name = "صالح المحسن", phone = "771998877", totalDebt = 0.0, notes = "نقطة بيع فرعية")
-            )
         }
     }
 
@@ -220,53 +196,5 @@ class SadadRepository(
         val savedTx = successTx.copy(id = txId)
 
         return TransactionResult.Success(savedTx)
-    }
-
-    // Customer & Debt Operations
-    suspend fun addNewCustomer(name: String, phone: String, initialDebt: Double, notes: String): Long {
-        val cId = customerDao.insertCustomer(
-            Customer(name = name, phone = phone, totalDebt = initialDebt, notes = notes)
-        )
-        if (initialDebt != 0.0) {
-            customerDao.insertLedgerEntry(
-                LedgerEntry(
-                    customerId = cId,
-                    amount = initialDebt,
-                    type = if (initialDebt > 0) LedgerType.DEBIT else LedgerType.CREDIT,
-                    description = if (initialDebt > 0) "رصيد دين افتتاحي" else "رصيد دائن افتتاحي",
-                    balanceAfter = initialDebt
-                )
-            )
-        }
-        return cId
-    }
-
-    suspend fun recordLedgerTransaction(
-        customerId: Long,
-        amount: Double,
-        type: LedgerType,
-        description: String
-    ) {
-        val customer = customerDao.getCustomerById(customerId) ?: return
-        val newDebt = if (type == LedgerType.DEBIT) {
-            customer.totalDebt + amount
-        } else {
-            customer.totalDebt - amount
-        }
-
-        customerDao.updateCustomerDebt(customerId, newDebt)
-        customerDao.insertLedgerEntry(
-            LedgerEntry(
-                customerId = customerId,
-                amount = amount,
-                type = type,
-                description = description,
-                balanceAfter = newDebt
-            )
-        )
-    }
-
-    fun getCustomerLedger(customerId: Long): Flow<List<LedgerEntry>> {
-        return customerDao.getCustomerLedger(customerId)
     }
 }

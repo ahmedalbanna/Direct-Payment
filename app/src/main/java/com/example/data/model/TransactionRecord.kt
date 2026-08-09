@@ -8,7 +8,7 @@ enum class TransactionStatus {
 }
 
 enum class ServiceType {
-    RECHARGE, BILL, DIGITAL_CARD, TRANSFER, DEBT_SETTLEMENT
+    RECHARGE, BILL, DIGITAL_CARD
 }
 
 @Entity(tableName = "transaction_records")

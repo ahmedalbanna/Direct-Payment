@@ -141,31 +141,6 @@ fun RechargeScreen(
             }
         }
 
-        // Progress Indicator
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, bottom = 4.dp),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            RechargeStep.entries.forEach { step ->
-                val isCompleted = step.ordinal < currentStep.ordinal
-                val isCurrent = step == currentStep
-                Box(
-                    modifier = Modifier
-                        .padding(horizontal = 4.dp)
-                        .height(4.dp)
-                        .width(40.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (isCurrent) PrimaryBlue 
-                            else if (isCompleted) PrimaryBlue.copy(alpha = 0.4f) 
-                            else Color.Gray.copy(alpha = 0.2f)
-                        )
-                )
-            }
-        }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()

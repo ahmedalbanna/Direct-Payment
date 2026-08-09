@@ -4,9 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.db.AppDatabase
-import com.example.data.model.Customer
-import com.example.data.model.LedgerEntry
-import com.example.data.model.LedgerType
 import com.example.data.model.MerchantProfile
 import com.example.data.model.ServiceType
 import com.example.data.model.TransactionRecord
@@ -25,8 +22,6 @@ enum class MainTab {
     RECHARGE,
     BILLS,
     DIGITAL_CARDS,
-    TRANSFER,
-    DEBT_LEDGER,
     HISTORY,
     SETTINGS
 }
@@ -49,7 +44,6 @@ class SadadViewModel(application: Application) : AndroidViewModel(application) {
 
     val merchantProfile: StateFlow<MerchantProfile?>
     val transactions: StateFlow<List<TransactionRecord>>
-    val customers: StateFlow<List<Customer>>
 
     private val _activeTab = MutableStateFlow(MainTab.DASHBOARD)
     val activeTab: StateFlow<MainTab> = _activeTab.asStateFlow()
@@ -80,23 +74,14 @@ class SadadViewModel(application: Application) : AndroidViewModel(application) {
     val isInquiring: StateFlow<Boolean> = _isInquiring.asStateFlow()
 
     // Customer Ledger State
-    private val _selectedCustomer = MutableStateFlow<Customer?>(null)
-    val selectedCustomer: StateFlow<Customer?> = _selectedCustomer.asStateFlow()
-
-    private val _customerLedgerEntries = MutableStateFlow<List<LedgerEntry>>(emptyList())
-    val customerLedgerEntries: StateFlow<List<LedgerEntry>> = _customerLedgerEntries.asStateFlow()
-
     init {
         val db = AppDatabase.getDatabase(application)
-        repository = SadadRepository(db.merchantDao(), db.transactionDao(), db.customerDao())
+        repository = SadadRepository(db.merchantDao(), db.transactionDao())
 
         merchantProfile = repository.merchantProfile.stateIn(
             viewModelScope, SharingStarted.WhileSubscribed(5000), null
         )
         transactions = repository.allTransactions.stateIn(
-            viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList()
-        )
-        customers = repository.allCustomers.stateIn(
             viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList()
         )
 
@@ -242,45 +227,6 @@ class SadadViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             repository.updateSecurityPin(newPin)
             _toastMessage.value = "تم تغيير رمز PIN الأمني بنجاح!"
-        }
-    }
-
-    // Customer & Ledger Operations
-    fun addCustomer(name: String, phone: String, initialDebt: Double, notes: String) {
-        if (name.isBlank()) {
-            _toastMessage.value = "يرجى إدخال اسم العميل"
-            return
-        }
-        viewModelScope.launch {
-            repository.addNewCustomer(name, phone, initialDebt, notes)
-            _toastMessage.value = "تم إضافة العميل بنجاح"
-        }
-    }
-
-    fun selectCustomer(customer: Customer?) {
-        _selectedCustomer.value = customer
-        if (customer != null) {
-            viewModelScope.launch {
-                repository.getCustomerLedger(customer.id).collect { list ->
-                    _customerLedgerEntries.value = list
-                }
-            }
-        } else {
-            _customerLedgerEntries.value = emptyList()
-        }
-    }
-
-    fun recordLedgerTransaction(amount: Double, type: LedgerType, description: String) {
-        val customer = _selectedCustomer.value ?: return
-        if (amount <= 0) {
-            _toastMessage.value = "يرجى إدخال مبلغ صحيح"
-            return
-        }
-        viewModelScope.launch {
-            repository.recordLedgerTransaction(customer.id, amount, type, description)
-            _toastMessage.value = if (type == LedgerType.DEBIT) "تم تسجيل الدين على العميل" else "تم تسجيل السداد من العميل"
-            // Refresh customer
-            selectCustomer(customer.copy(totalDebt = if (type == LedgerType.DEBIT) customer.totalDebt + amount else customer.totalDebt - amount))
         }
     }
 }

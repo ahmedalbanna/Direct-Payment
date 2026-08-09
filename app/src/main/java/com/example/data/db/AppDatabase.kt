@@ -4,26 +4,21 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.data.model.Customer
-import com.example.data.model.LedgerEntry
 import com.example.data.model.MerchantProfile
 import com.example.data.model.TransactionRecord
 
 @Database(
     entities = [
         MerchantProfile::class,
-        TransactionRecord::class,
-        Customer::class,
-        LedgerEntry::class
+        TransactionRecord::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun merchantDao(): MerchantDao
     abstract fun transactionDao(): TransactionDao
-    abstract fun customerDao(): CustomerDao
 
     companion object {
         @Volatile

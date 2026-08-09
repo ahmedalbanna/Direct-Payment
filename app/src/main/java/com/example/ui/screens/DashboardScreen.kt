@@ -102,20 +102,6 @@ fun DashboardScreen(
             primaryColor = Color(0xFFF59E0B)
         ),
         ActionMenuItem(
-            id = MainTab.TRANSFER,
-            title = "تحويل مالي",
-            subtitle = "تحويل بين الحسابات والوكلاء",
-            icon = Icons.Default.SendAndArchive,
-            primaryColor = Color(0xFF0D9488)
-        ),
-        ActionMenuItem(
-            id = MainTab.DEBT_LEDGER,
-            title = "دفتر الديون",
-            subtitle = "تسجيل ديون وكشف حساب العملاء",
-            icon = Icons.Default.Book,
-            primaryColor = Color(0xFF7C3AED)
-        ),
-        ActionMenuItem(
             id = MainTab.HISTORY,
             title = "كشف حساب لحظي",
             subtitle = "سجل العمليات السابقة والتقارير",

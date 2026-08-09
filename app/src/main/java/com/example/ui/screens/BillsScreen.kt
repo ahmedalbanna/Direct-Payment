@@ -153,31 +153,6 @@ fun BillsScreen(
             }
         }
 
-        // Progress Stepper
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp, bottom = 8.dp),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            BillsStep.entries.forEach { step ->
-                val isCompleted = step.ordinal < currentStep.ordinal
-                val isCurrent = step == currentStep
-                Box(
-                    modifier = Modifier
-                        .padding(horizontal = 4.dp)
-                        .height(4.dp)
-                        .width(60.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (isCurrent) PrimaryBlue 
-                            else if (isCompleted) PrimaryBlue.copy(alpha = 0.4f) 
-                            else Color.Gray.copy(alpha = 0.15f)
-                        )
-                )
-            }
-        }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()

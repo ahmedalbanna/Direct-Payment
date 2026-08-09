@@ -41,9 +41,6 @@ fun MainScreen(viewModel: SadadViewModel) {
     val activeTab by viewModel.activeTab.collectAsStateWithLifecycle()
     val isBalanceVisible by viewModel.isBalanceVisible.collectAsStateWithLifecycle()
     val transactions by viewModel.transactions.collectAsStateWithLifecycle()
-    val customers by viewModel.customers.collectAsStateWithLifecycle()
-    val selectedCustomer by viewModel.selectedCustomer.collectAsStateWithLifecycle()
-    val customerLedgerEntries by viewModel.customerLedgerEntries.collectAsStateWithLifecycle()
 
     val pendingTx by viewModel.pendingTx.collectAsStateWithLifecycle()
     val receiptTx by viewModel.receiptTx.collectAsStateWithLifecycle()
@@ -111,21 +108,6 @@ fun MainScreen(viewModel: SadadViewModel) {
                     MainTab.DIGITAL_CARDS -> DigitalCardsScreen(
                         onBack = { viewModel.selectTab(MainTab.DASHBOARD) },
                         onSubmitCardPurchase = { viewModel.setPendingTransaction(it) }
-                    )
-
-                    MainTab.TRANSFER -> TransferScreen(
-                        onBack = { viewModel.selectTab(MainTab.DASHBOARD) },
-                        onSubmitTransfer = { viewModel.setPendingTransaction(it) }
-                    )
-
-                    MainTab.DEBT_LEDGER -> DebtLedgerScreen(
-                        customers = customers,
-                        selectedCustomer = selectedCustomer,
-                        ledgerEntries = customerLedgerEntries,
-                        onBack = { viewModel.selectTab(MainTab.DASHBOARD) },
-                        onSelectCustomer = { viewModel.selectCustomer(it) },
-                        onAddCustomer = { name, phone, debt, notes -> viewModel.addCustomer(name, phone, debt, notes) },
-                        onRecordLedgerTransaction = { amount, type, desc -> viewModel.recordLedgerTransaction(amount, type, desc) }
                     )
 
                     MainTab.HISTORY -> TransactionHistoryScreen(
