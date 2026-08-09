@@ -18,7 +18,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ui.theme.PrimaryBlue
 
 @Composable
 fun LoginScreen(
@@ -32,7 +31,7 @@ fun LoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.background)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -40,14 +39,14 @@ fun LoginScreen(
         Surface(
             modifier = Modifier.size(80.dp),
             shape = CircleShape,
-            color = PrimaryBlue.copy(alpha = 0.1f)
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
                     imageVector = Icons.Default.Lock,
                     contentDescription = null,
                     modifier = Modifier.size(40.dp),
-                    tint = PrimaryBlue
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -56,15 +55,14 @@ fun LoginScreen(
 
         Text(
             text = "مرحباً بك، $merchantName",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
+            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         Text(
             text = "أدخل رمز PIN للمتابعة",
             style = MaterialTheme.typography.bodyMedium,
-            color = Color.Gray,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 8.dp)
         )
 
@@ -81,7 +79,10 @@ fun LoginScreen(
                     modifier = Modifier
                         .size(16.dp)
                         .clip(CircleShape)
-                        .background(if (isFilled) PrimaryBlue else Color.LightGray.copy(alpha = 0.5f))
+                        .background(
+                            if (isFilled) MaterialTheme.colorScheme.primary 
+                            else MaterialTheme.colorScheme.outlineVariant
+                        )
                 )
             }
         }
@@ -114,7 +115,11 @@ fun LoginScreen(
                                     onClick = { if (pin.isNotEmpty()) pin = pin.dropLast(1) },
                                     modifier = Modifier.size(72.dp)
                                 ) {
-                                    Icon(Icons.Default.Backspace, contentDescription = "مسح")
+                                    Icon(
+                                        imageVector = Icons.Default.Backspace,
+                                        contentDescription = "مسح",
+                                        tint = MaterialTheme.colorScheme.onSurface
+                                    )
                                 }
                             }
                             else -> {
@@ -126,8 +131,6 @@ fun LoginScreen(
                                             if (pin.length < maxPinLength) {
                                                 pin += char
                                                 if (pin.length == maxPinLength) {
-                                                    // In a real app, verify PIN here
-                                                    // For now, any 4 digits work for the demo
                                                     onLoginSuccess()
                                                 }
                                             }
@@ -136,8 +139,8 @@ fun LoginScreen(
                                 ) {
                                     Text(
                                         text = char,
-                                        fontSize = 28.sp,
-                                        fontWeight = FontWeight.SemiBold
+                                        style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.SemiBold),
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                 }
                             }
@@ -152,8 +155,8 @@ fun LoginScreen(
         TextButton(onClick = onNavigateToReset) {
             Text(
                 text = "نسيت رمز PIN؟",
-                color = PrimaryBlue,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.primary
             )
         }
     }

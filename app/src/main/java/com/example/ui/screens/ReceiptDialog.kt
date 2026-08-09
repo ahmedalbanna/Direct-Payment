@@ -59,9 +59,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.data.model.TransactionRecord
 import com.example.data.model.TransactionStatus
-import com.example.ui.theme.ErrorRed
-import com.example.ui.theme.PrimaryBlue
-import com.example.ui.theme.SuccessGreen
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -89,7 +86,7 @@ fun ReceiptDialog(
             modifier = Modifier
                 .fillMaxWidth(0.92f)
                 .clip(RoundedCornerShape(32.dp)),
-            color = Color.White
+            color = MaterialTheme.colorScheme.surface
         ) {
             Column(
                 modifier = Modifier
@@ -105,18 +102,21 @@ fun ReceiptDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = onDismiss) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = "إغلاق", tint = Color.Gray)
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "إغلاق",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                     Text(
                         text = if (showThermalPreview) "معاينة الطباعة" else "سند العملية",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
                     IconButton(onClick = { showThermalPreview = !showThermalPreview }) {
                         Icon(
                             imageVector = Icons.Default.Print,
                             contentDescription = "تبديل العرض",
-                            tint = if (showThermalPreview) PrimaryBlue else Color.Gray
+                            tint = if (showThermalPreview) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -132,13 +132,13 @@ fun ReceiptDialog(
                         Surface(
                             modifier = Modifier.size(64.dp),
                             shape = CircleShape,
-                            color = (if (isSuccess) SuccessGreen else ErrorRed).copy(alpha = 0.1f)
+                            color = (if (isSuccess) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error).copy(alpha = 0.1f)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     imageVector = if (isSuccess) Icons.Default.CheckCircle else Icons.Default.Error,
                                     contentDescription = null,
-                                    tint = if (isSuccess) SuccessGreen else ErrorRed,
+                                    tint = if (isSuccess) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error,
                                     modifier = Modifier.size(40.dp)
                                 )
                             }
@@ -148,15 +148,14 @@ fun ReceiptDialog(
 
                         Text(
                             text = if (isSuccess) "عملية ناجحة" else "عملية غير مكتملة",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = if (isSuccess) SuccessGreen else ErrorRed
+                            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.ExtraBold),
+                            color = if (isSuccess) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
                         )
 
                         Text(
                             text = formattedDate,
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color.Gray
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
                         Spacer(modifier = Modifier.height(24.dp))
@@ -165,7 +164,7 @@ fun ReceiptDialog(
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(24.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
                             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                         ) {
                             Column(
@@ -178,11 +177,23 @@ fun ReceiptDialog(
                                     ReceiptDetailRow("اسم المشترك", transaction.subscriberName!!)
                                 }
                                 ReceiptDetailRow("رقم المرجع", transaction.transactionCode)
-                                
-                                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = Color.LightGray.copy(alpha = 0.3f))
-                                
-                                ReceiptDetailRow("المبلغ الإجمالي", "${transaction.amount} ريال", isBold = true, isLarge = true)
-                                ReceiptDetailRow("الرصيد بعد الخصم", "${transaction.balanceAfter} ريال", isBold = true)
+
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(vertical = 4.dp),
+                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                                )
+
+                                ReceiptDetailRow(
+                                    "المبلغ الإجمالي",
+                                    "${transaction.amount} ريال",
+                                    isBold = true,
+                                    isLarge = true
+                                )
+                                ReceiptDetailRow(
+                                    "الرصيد بعد الخصم",
+                                    "${transaction.balanceAfter} ريال",
+                                    isBold = true
+                                )
                             }
                         }
 
@@ -191,21 +202,26 @@ fun ReceiptDialog(
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(16.dp),
-                                colors = CardDefaults.cardColors(containerColor = PrimaryBlue.copy(alpha = 0.05f)),
-                                border = androidx.compose.foundation.BorderStroke(1.dp, PrimaryBlue.copy(alpha = 0.2f))
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f)),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
                             ) {
                                 Column(
                                     modifier = Modifier.padding(16.dp),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Text("كود التفعيل / البطاقة", fontSize = 12.sp, color = PrimaryBlue, fontWeight = FontWeight.Bold)
+                                    Text(
+                                        "كود التفعيل / البطاقة",
+                                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
                                         text = transaction.digitalCode!!,
-                                        style = MaterialTheme.typography.headlineSmall,
-                                        fontWeight = FontWeight.Black,
-                                        color = PrimaryBlue,
-                                        letterSpacing = 2.sp
+                                        style = MaterialTheme.typography.headlineSmall.copy(
+                                            fontWeight = FontWeight.Black,
+                                            letterSpacing = 2.sp
+                                        ),
+                                        color = MaterialTheme.colorScheme.primary
                                     )
                                 }
                             }
@@ -254,14 +270,38 @@ fun ReceiptDialog(
                                     fontWeight = FontWeight.Black,
                                     fontSize = 18.sp,
                                     textAlign = TextAlign.Center,
-                                    fontFamily = FontFamily.Monospace
+                                    fontFamily = FontFamily.Monospace,
+                                    color = Color.Black
                                 )
-                                Text("هاتف: $merchantPhone", fontSize = 12.sp, fontFamily = FontFamily.Monospace)
-                                Text("--------------------------------", fontFamily = FontFamily.Monospace)
+                                Text(
+                                    text = "هاتف: $merchantPhone",
+                                    fontSize = 12.sp,
+                                    fontFamily = FontFamily.Monospace,
+                                    color = Color.Black
+                                )
+                                Text(
+                                    text = "--------------------------------",
+                                    fontFamily = FontFamily.Monospace,
+                                    color = Color.Black
+                                )
                                 
-                                Text("رقم العملية: ${transaction.transactionCode}", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                                Text(formattedDate, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
-                                Text("--------------------------------", fontFamily = FontFamily.Monospace)
+                                Text(
+                                    text = "رقم العملية: ${transaction.transactionCode}",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp,
+                                    color = Color.Black
+                                )
+                                Text(
+                                    text = formattedDate,
+                                    fontSize = 11.sp,
+                                    fontFamily = FontFamily.Monospace,
+                                    color = Color.Black
+                                )
+                                Text(
+                                    text = "--------------------------------",
+                                    fontFamily = FontFamily.Monospace,
+                                    color = Color.Black
+                                )
 
                                 ThermalDetailRow("الخدمة:", transaction.serviceName)
                                 ThermalDetailRow("الرقم:", transaction.targetNumber)
@@ -298,9 +338,12 @@ fun ReceiptDialog(
                         onClick = onDismiss,
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Gray)
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurfaceVariant)
                     ) {
-                        Text("إغلاق", fontWeight = FontWeight.Bold)
+                        Text(
+                            "إغلاق",
+                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                        )
                     }
 
                     Button(
@@ -328,11 +371,18 @@ fun ReceiptDialog(
                         },
                         modifier = Modifier.weight(1.5f),
                         shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
-                        Icon(imageVector = Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("مشاركة السند", fontWeight = FontWeight.Bold)
+                        Text(
+                            "مشاركة السند",
+                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                        )
                     }
                 }
             }
@@ -341,18 +391,35 @@ fun ReceiptDialog(
 }
 
 @Composable
-private fun ReceiptDetailRow(label: String, value: String, isBold: Boolean = false, isHeader: Boolean = false, isLarge: Boolean = false) {
+private fun ReceiptDetailRow(
+    label: String,
+    value: String,
+    isBold: Boolean = false,
+    isHeader: Boolean = false,
+    isLarge: Boolean = false
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = label, color = Color.Gray, fontSize = 13.sp)
+        Text(
+            text = label,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodySmall
+        )
         Text(
             text = value,
-            fontWeight = if (isBold || isHeader) FontWeight.ExtraBold else FontWeight.Bold,
-            fontSize = if (isLarge) 18.sp else if (isHeader) 15.sp else 13.sp,
-            color = if (isHeader) PrimaryBlue else Color.Black
+            style = if (isLarge) {
+                MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold)
+            } else if (isHeader) {
+                MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.ExtraBold)
+            } else if (isBold) {
+                MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
+            } else {
+                MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium)
+            },
+            color = if (isHeader) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
         )
     }
 }
@@ -360,11 +427,24 @@ private fun ReceiptDetailRow(label: String, value: String, isBold: Boolean = fal
 @Composable
 private fun ThermalDetailRow(label: String, value: String) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 2.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = label, fontFamily = FontFamily.Monospace, fontSize = 12.sp)
-        Text(text = value, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall.copy(fontFamily = FontFamily.Monospace),
+            color = Color.Black
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Bold
+            ),
+            color = Color.Black
+        )
     }
 }
 

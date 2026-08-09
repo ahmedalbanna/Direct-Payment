@@ -48,10 +48,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.TransactionRecord
 import com.example.data.model.TransactionStatus
-import com.example.ui.theme.ErrorRed
-import com.example.ui.theme.PendingYellow
-import com.example.ui.theme.PrimaryBlue
-import com.example.ui.theme.SuccessGreen
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -139,8 +135,8 @@ fun TransactionHistoryScreen(
 
         Text(
             text = "نتائج كشف الحساب (${filteredList.size}):",
-            fontWeight = FontWeight.Bold,
-            fontSize = 13.sp
+            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         // Transactions List
@@ -151,9 +147,9 @@ fun TransactionHistoryScreen(
             items(filteredList) { tx ->
                 val isSuccess = tx.status == TransactionStatus.SUCCESS
                 val statusColor = when (tx.status) {
-                    TransactionStatus.SUCCESS -> SuccessGreen
-                    TransactionStatus.FAILED -> ErrorRed
-                    TransactionStatus.PENDING -> PendingYellow
+                    TransactionStatus.SUCCESS -> MaterialTheme.colorScheme.secondary
+                    TransactionStatus.FAILED -> MaterialTheme.colorScheme.error
+                    TransactionStatus.PENDING -> MaterialTheme.colorScheme.tertiary
                 }
 
                 Card(
@@ -198,14 +194,13 @@ fun TransactionHistoryScreen(
                                 Column {
                                     Text(
                                         text = tx.serviceName,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 14.sp,
+                                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                                         color = MaterialTheme.colorScheme.onSurface
                                     )
                                     Text(
                                         text = "الرقم: ${tx.targetNumber}",
-                                        fontSize = 12.sp,
-                                        color = Color.Gray
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
                             }
@@ -213,8 +208,7 @@ fun TransactionHistoryScreen(
                             Column(horizontalAlignment = Alignment.End) {
                                 Text(
                                     text = "${tx.amount} ريال",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 15.sp,
+                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
@@ -223,14 +217,13 @@ fun TransactionHistoryScreen(
                                         TransactionStatus.FAILED -> "فاشلة/مسترجعة"
                                         TransactionStatus.PENDING -> "معلقة"
                                     },
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
                                     color = statusColor
                                 )
                             }
                         }
 
-                        HorizontalDivider(color = Color.Gray.copy(alpha = 0.15f))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -239,23 +232,22 @@ fun TransactionHistoryScreen(
                         ) {
                             Text(
                                 text = "الرصيد: قبل (${tx.balanceBefore.toInt()}) → بعد (${tx.balanceAfter.toInt()})",
-                                fontSize = 11.sp,
-                                color = Color.Gray
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
 
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
                                     imageVector = Icons.Default.Print,
                                     contentDescription = "طباعة",
-                                    tint = PrimaryBlue,
-                                    modifier = Modifier.size(16.dp)
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(14.dp)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = tx.transactionCode,
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = PrimaryBlue
+                                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.primary
                                 )
                             }
                         }
@@ -273,14 +265,13 @@ private fun FilterChipItem(title: String, isSelected: Boolean, onClick: () -> Un
             .clickable(onClick = onClick)
             .padding(vertical = 2.dp),
         shape = RoundedCornerShape(10.dp),
-        color = if (isSelected) PrimaryBlue else MaterialTheme.colorScheme.surface
+        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
     ) {
         Text(
             text = title,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            color = if (isSelected) Color.White else Color.Gray
+            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }

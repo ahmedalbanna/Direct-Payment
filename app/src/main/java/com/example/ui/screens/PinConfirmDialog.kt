@@ -53,8 +53,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.ui.theme.ErrorRed
-import com.example.ui.theme.PrimaryBlue
 import com.example.ui.viewmodel.PendingTransaction
 
 @Composable
@@ -76,7 +74,7 @@ fun PinConfirmDialog(
             modifier = Modifier
                 .fillMaxWidth(0.95f)
                 .clip(RoundedCornerShape(32.dp)),
-            color = Color.White
+            color = MaterialTheme.colorScheme.surface
         ) {
             Column(
                 modifier = Modifier
@@ -91,20 +89,23 @@ fun PinConfirmDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = onDismiss, enabled = !isProcessing) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = "إغلاق", tint = Color.Gray)
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "إغلاق",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = "تأكيد العملية",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Icon(
                             imageVector = Icons.Default.Security,
                             contentDescription = null,
-                            tint = PrimaryBlue,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -116,7 +117,7 @@ fun PinConfirmDialog(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                 ) {
                     Column(
@@ -137,7 +138,7 @@ fun PinConfirmDialog(
                 Text(
                     text = "أدخل رمز PIN لتأكيد الخصم",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -153,17 +154,16 @@ fun PinConfirmDialog(
                             modifier = Modifier
                                 .size(14.dp)
                                 .clip(CircleShape)
-                                .background(if (isFilled) PrimaryBlue else Color.LightGray.copy(alpha = 0.5f))
+                                .background(if (isFilled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
                         )
                     }
                 }
 
-                AnimatedVisibility(visible = errorMessage != null) {
+                AnimatedVisibility(errorMessage != null) {
                     Text(
                         text = errorMessage ?: "",
-                        color = ErrorRed,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
                         modifier = Modifier.padding(top = 16.dp)
                     )
                 }
@@ -172,9 +172,16 @@ fun PinConfirmDialog(
 
                 if (isProcessing) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        CircularProgressIndicator(color = PrimaryBlue, strokeWidth = 3.dp)
+                        CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.primary,
+                            strokeWidth = 3.dp
+                        )
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text("جاري معالجة الطلب...", color = PrimaryBlue, fontWeight = FontWeight.Bold)
+                        Text(
+                            "جاري معالجة الطلب...",
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                        )
                     }
                 } else {
                     // Numeric Pad for Dialog
@@ -200,10 +207,16 @@ fun PinConfirmDialog(
                                         null -> Spacer(modifier = Modifier.size(60.dp))
                                         "back" -> {
                                             IconButton(
-                                                onClick = { if (pin.isNotEmpty()) pin = pin.dropLast(1) },
+                                                onClick = {
+                                                    if (pin.isNotEmpty()) pin = pin.dropLast(1)
+                                                },
                                                 modifier = Modifier.size(60.dp)
                                             ) {
-                                                Icon(Icons.Default.Backspace, contentDescription = "مسح", tint = Color.DarkGray)
+                                                Icon(
+                                                    imageVector = Icons.Default.Backspace,
+                                                    contentDescription = "مسح",
+                                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
                                             }
                                         }
                                         else -> {
@@ -223,8 +236,7 @@ fun PinConfirmDialog(
                                             ) {
                                                 Text(
                                                     text = char,
-                                                    fontSize = 24.sp,
-                                                    fontWeight = FontWeight.SemiBold
+                                                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.SemiBold)
                                                 )
                                             }
                                         }
@@ -240,17 +252,31 @@ fun PinConfirmDialog(
 }
 
 @Composable
-private fun PinConfirmDetailRow(label: String, value: String, isPrimary: Boolean = false, isBold: Boolean = false) {
+private fun PinConfirmDetailRow(
+    label: String,
+    value: String,
+    isPrimary: Boolean = false,
+    isBold: Boolean = false
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = label, color = Color.Gray, fontSize = 13.sp)
+        Text(
+            text = label,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodySmall
+        )
         Text(
             text = value,
-            fontWeight = if (isBold || isPrimary) FontWeight.Bold else FontWeight.Medium,
-            fontSize = if (isPrimary) 14.sp else 13.sp,
-            color = if (isPrimary) PrimaryBlue else Color.Black
+            style = if (isPrimary) {
+                MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+            } else if (isBold) {
+                MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
+            } else {
+                MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium)
+            },
+            color = if (isPrimary) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
         )
     }
 }

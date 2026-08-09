@@ -62,8 +62,6 @@ import androidx.compose.ui.unit.sp
 import com.example.data.model.ServiceCatalogData
 import com.example.data.model.ServiceType
 import com.example.data.repository.BillInquiryResult
-import com.example.ui.theme.PrimaryBlue
-import com.example.ui.theme.SuccessGreen
 import com.example.ui.viewmodel.PendingTransaction
 
 enum class BillsStep {
@@ -146,8 +144,8 @@ fun BillsScreen(
                             BillsStep.ENTER_ACCOUNT -> "الخطوة 2: أدخل بيانات الحساب"
                             BillsStep.REVIEW_AND_PAY -> "الخطوة 3: المراجعة والدفع"
                         },
-                        fontSize = 12.sp,
-                        color = PrimaryBlue
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -164,8 +162,7 @@ fun BillsScreen(
                 BillsStep.SELECT_SERVICE -> {
                     Text(
                         text = "اختر الخدمة المطلوب سدادها:",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
 
                     services.forEach { service ->
@@ -202,9 +199,16 @@ fun BillsScreen(
                                     )
                                 }
                                 Spacer(modifier = Modifier.width(16.dp))
-                                Text(text = service.nameAr, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                                Text(
+                                    text = service.nameAr,
+                                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                                )
                                 Spacer(modifier = Modifier.weight(1f))
-                                Icon(imageVector = Icons.Default.CheckCircle, contentDescription = null, tint = if (isSelected) service.primaryColor else Color.Transparent)
+                                Icon(
+                                    imageVector = Icons.Default.CheckCircle,
+                                    contentDescription = null,
+                                    tint = if (isSelected) service.primaryColor else Color.Transparent
+                                )
                             }
                         }
                     }
@@ -213,8 +217,7 @@ fun BillsScreen(
                 BillsStep.ENTER_ACCOUNT -> {
                     Text(
                         text = "بيانات الحساب لخدمة ${selectedService.nameAr}:",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
 
                     Card(
@@ -238,19 +241,26 @@ fun BillsScreen(
 
                             Button(
                                 onClick = { onInquireBill(selectedService.id, accountId) },
-                                modifier = Modifier.fillMaxWidth().height(54.dp).testTag("inquire_bill_button_wizard"),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(54.dp)
+                                    .testTag("inquire_bill_button_wizard"),
                                 enabled = accountId.length >= 3 && !isInquiring,
                                 shape = RoundedCornerShape(16.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = selectedService.primaryColor)
                             ) {
                                 if (isInquiring) {
-                                    CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 3.dp, color = Color.White)
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(24.dp),
+                                        strokeWidth = 3.dp,
+                                        color = MaterialTheme.colorScheme.onPrimary
+                                    )
                                     Spacer(modifier = Modifier.width(12.dp))
-                                    Text("جاري الاستعلام...")
+                                    Text("جاري الاستعلام...", style = MaterialTheme.typography.labelLarge)
                                 } else {
                                     Icon(imageVector = Icons.Default.Search, contentDescription = null)
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text("استعلام عن المستحق")
+                                    Text("استعلام عن المستحق", style = MaterialTheme.typography.labelLarge)
                                 }
                             }
                         }
@@ -260,25 +270,44 @@ fun BillsScreen(
                 BillsStep.REVIEW_AND_PAY -> {
                     Text(
                         text = "تفاصيل المشترك والمبلغ المستحق:",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
 
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(containerColor = SuccessGreen.copy(alpha = 0.05f)),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, SuccessGreen.copy(alpha = 0.3f))
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.1f)
+                        ),
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)
+                        )
                     ) {
-                        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Column(
+                            modifier = Modifier.padding(20.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(imageVector = Icons.Default.CheckCircle, contentDescription = null, tint = SuccessGreen)
+                                Icon(
+                                    imageVector = Icons.Default.CheckCircle,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.secondary
+                                )
                                 Spacer(modifier = Modifier.width(12.dp))
-                                Text(text = "تم جلب البيانات بنجاح", color = SuccessGreen, fontWeight = FontWeight.Bold)
+                                Text(
+                                    text = "تم جلب البيانات بنجاح",
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                                )
                             }
-                            HorizontalDivider(color = Color.Gray.copy(alpha = 0.1f))
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
                             DetailInfoRow("اسم المشترك:", inquiryResult?.subscriberName ?: "غير متوفر")
-                            DetailInfoRow("المبلغ المستحق:", "${inquiryResult?.dueAmountYer ?: 0.0} ريال", isPrice = true)
+                            DetailInfoRow(
+                                "المبلغ المستحق:",
+                                "${inquiryResult?.dueAmountYer ?: 0.0} ريال",
+                                isPrice = true
+                            )
                         }
                     }
 
@@ -287,16 +316,24 @@ fun BillsScreen(
                         shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                     ) {
-                        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text(text = "مبلغ السداد المطلوب:", fontWeight = FontWeight.Bold)
+                        Column(
+                            modifier = Modifier.padding(20.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "مبلغ السداد المطلوب:",
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                            )
                             OutlinedTextField(
                                 value = payAmountText,
                                 onValueChange = { payAmountText = it },
-                                modifier = Modifier.fillMaxWidth().testTag("bill_pay_amount_input_wizard"),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .testTag("bill_pay_amount_input_wizard"),
                                 singleLine = true,
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 shape = RoundedCornerShape(14.dp),
-                                suffix = { Text("ريال") }
+                                suffix = { Text("ريال", style = MaterialTheme.typography.bodyMedium) }
                             )
                         }
                     }
@@ -316,12 +353,18 @@ fun BillsScreen(
                                 )
                             )
                         },
-                        modifier = Modifier.fillMaxWidth().height(58.dp).testTag("submit_bill_pay_button_wizard"),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(58.dp)
+                            .testTag("submit_bill_pay_button_wizard"),
                         enabled = parsedAmount > 0,
                         shape = RoundedCornerShape(18.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = selectedService.primaryColor)
                     ) {
-                        Text("تأكيد السداد الآن ($parsedAmount ريال)", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text(
+                            "تأكيد السداد الآن ($parsedAmount ريال)",
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                        )
                     }
                 }
             }
@@ -332,14 +375,23 @@ fun BillsScreen(
 @Composable
 fun DetailInfoRow(label: String, value: String, isPrice: Boolean = false) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = label, color = Color.Gray, fontSize = 13.sp)
+        Text(
+            text = label,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodySmall
+        )
         Text(
             text = value,
-            fontWeight = FontWeight.Bold,
-            fontSize = if (isPrice) 16.sp else 14.sp,
+            style = if (isPrice) {
+                MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+            } else {
+                MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+            },
             color = if (isPrice) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
         )
     }

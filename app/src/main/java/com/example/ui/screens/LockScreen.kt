@@ -44,9 +44,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ui.theme.DarkNavy
-import com.example.ui.theme.ErrorRed
-import com.example.ui.theme.PrimaryBlue
 
 @Composable
 fun LockScreen(
@@ -60,7 +57,7 @@ fun LockScreen(
         modifier = Modifier
             .fillMaxSize()
             .testTag("pos_lock_screen"),
-        color = DarkNavy
+        color = MaterialTheme.colorScheme.primaryContainer
     ) {
         Column(
             modifier = Modifier
@@ -73,13 +70,13 @@ fun LockScreen(
                 modifier = Modifier
                     .size(80.dp)
                     .clip(CircleShape)
-                    .background(PrimaryBlue.copy(alpha = 0.2f)),
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Lock,
                     contentDescription = null,
-                    tint = PrimaryBlue,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(44.dp)
                 )
             }
@@ -88,15 +85,14 @@ fun LockScreen(
 
             Text(
                 text = "سداد المباشر - مقفل للأمان",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
+                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
 
             Text(
                 text = merchantName,
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
                 modifier = Modifier.padding(top = 4.dp)
             )
 
@@ -115,8 +111,7 @@ fun LockScreen(
                 ) {
                     Text(
                         text = "أدخل رمز PIN لإلغاء القفل:",
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 15.sp,
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
                         color = MaterialTheme.colorScheme.onSurface
                     )
 
@@ -134,11 +129,22 @@ fun LockScreen(
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                        placeholder = { Text("• • • •", textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) },
-                        leadingIcon = { Icon(imageVector = Icons.Default.LockReset, contentDescription = null) },
+                        placeholder = {
+                            Text(
+                                "• • • •",
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.LockReset,
+                                contentDescription = null
+                            )
+                        },
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryBlue,
-                            unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
                         ),
                         shape = RoundedCornerShape(14.dp)
                     )
@@ -146,9 +152,8 @@ fun LockScreen(
                     AnimatedVisibility(visible = showError) {
                         Text(
                             text = "رمز PIN غير صحيح! يرجى المحاولة مجدداً (الرمز الافتراضي 1234)",
-                            color = ErrorRed,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.padding(top = 8.dp)
                         )
@@ -168,10 +173,13 @@ fun LockScreen(
                             .fillMaxWidth()
                             .height(50.dp)
                             .testTag("unlock_pos_button"),
-                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text(text = "فتح التطبيق", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = "فتح التطبيق",
+                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                        )
                     }
                 }
             }

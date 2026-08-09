@@ -55,19 +55,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.MerchantProfile
 import com.example.data.model.TransactionRecord
-import com.example.ui.theme.AccentGold
-import com.example.ui.theme.DarkNavy
-import com.example.ui.theme.PrimaryBlue
-import com.example.ui.theme.SecondaryTeal
+import com.example.ui.theme.SabafonBlue
+import com.example.ui.theme.YemenMobileRed
 import com.example.ui.viewmodel.MainTab
 
 data class ActionMenuItem(
     val id: MainTab,
     val title: String,
     val subtitle: String,
-    val icon: ImageVector,
-    val primaryColor: Color
+    val icon: ImageVector
 )
+
+@Composable
+fun MainTab.toServiceColor(): Color = when (this) {
+    MainTab.RECHARGE -> YemenMobileRed
+    MainTab.BILLS -> MaterialTheme.colorScheme.primary
+    MainTab.DIGITAL_CARDS -> MaterialTheme.colorScheme.tertiary
+    MainTab.HISTORY -> SabafonBlue
+    MainTab.SETTINGS -> MaterialTheme.colorScheme.onSurfaceVariant
+    else -> MaterialTheme.colorScheme.primary
+}
 
 @Composable
 fun DashboardScreen(
@@ -84,36 +91,31 @@ fun DashboardScreen(
             id = MainTab.RECHARGE,
             title = "تعبئة رصيد فوري",
             subtitle = "يمن موبايل، U، سبأفون، واي",
-            icon = Icons.Default.PhonelinkRing,
-            primaryColor = Color(0xFFDC2626)
+            icon = Icons.Default.PhonelinkRing
         ),
         ActionMenuItem(
             id = MainTab.BILLS,
             title = "سداد الفواتير",
             subtitle = "ثابت، ADSL، فورجي، كهرباء، ماء",
-            icon = Icons.Default.ReceiptLong,
-            primaryColor = Color(0xFF0284C7)
+            icon = Icons.Default.ReceiptLong
         ),
         ActionMenuItem(
             id = MainTab.DIGITAL_CARDS,
             title = "الكروت والألعاب",
             subtitle = "باجي، فري فاير، جوجل، فورجي",
-            icon = Icons.Default.CreditCard,
-            primaryColor = Color(0xFFF59E0B)
+            icon = Icons.Default.CreditCard
         ),
         ActionMenuItem(
             id = MainTab.HISTORY,
             title = "كشف حساب لحظي",
             subtitle = "سجل العمليات السابقة والتقارير",
-            icon = Icons.Default.History,
-            primaryColor = Color(0xFF2563EB)
+            icon = Icons.Default.History
         ),
         ActionMenuItem(
             id = MainTab.SETTINGS,
             title = "إعدادات الأمان",
             subtitle = "تغيير الـ PIN وإدارة الحساب",
-            icon = Icons.Default.Settings,
-            primaryColor = Color(0xFF4B5563)
+            icon = Icons.Default.Settings
         )
     )
 
@@ -133,14 +135,12 @@ fun DashboardScreen(
             Column {
                 Text(
                     text = merchantProfile?.merchantName ?: "محلات الباشا للخدمات",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
                 Text(
                     text = "رمز الوكيل: ${merchantProfile?.agentCode ?: "POS-9941"} • ${merchantProfile?.phone ?: ""}",
-                    fontSize = 12.sp,
-                    color = Color.Gray
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -154,7 +154,7 @@ fun DashboardScreen(
                 Icon(
                     imageVector = Icons.Default.Lock,
                     contentDescription = "قفل POS",
-                    tint = PrimaryBlue
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -172,7 +172,11 @@ fun DashboardScreen(
                     .fillMaxWidth()
                     .background(
                         Brush.linearGradient(
-                            colors = listOf(DarkNavy, Color(0xFF1E3A8A), Color(0xFF0F172A))
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.85f),
+                                MaterialTheme.colorScheme.primaryContainer
+                            )
                         )
                     )
                     .padding(20.dp)
@@ -187,22 +191,22 @@ fun DashboardScreen(
                             Icon(
                                 imageVector = Icons.Default.AccountBalanceWallet,
                                 contentDescription = null,
-                                tint = AccentGold,
+                                tint = MaterialTheme.colorScheme.tertiary,
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "رصيد التاجر المتوفر حالياً",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = Color.White.copy(alpha = 0.8f)
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                             )
                         }
-
+ 
                         IconButton(onClick = onToggleBalance) {
                             Icon(
                                 imageVector = if (isBalanceVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                                 contentDescription = "إخفاء/إظهار الرصيد",
-                                tint = Color.White
+                                tint = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     }
@@ -217,24 +221,21 @@ fun DashboardScreen(
                         if (isBalanceVisible) {
                             Text(
                                 text = "${merchantProfile?.balance ?: 0.0}",
-                                fontSize = 32.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
+                                style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                         } else {
                             Text(
                                 text = "• • • • • • • •",
-                                fontSize = 28.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = AccentGold
+                                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.tertiary
                             )
                         }
-
+ 
                         Text(
                             text = "ريال يمني",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = AccentGold,
+                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
+                            color = MaterialTheme.colorScheme.tertiary,
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
                     }
@@ -252,23 +253,24 @@ fun DashboardScreen(
                             Icon(
                                 imageVector = Icons.Default.AddCard,
                                 contentDescription = null,
-                                tint = AccentGold,
+                                tint = MaterialTheme.colorScheme.tertiary,
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("تغذية / إيداع رصيد", color = Color.White, fontSize = 12.sp)
+                            Text(
+                                "تغذية / إيداع رصيد",
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                style = MaterialTheme.typography.labelMedium
+                            )
                         }
                     }
                 }
             }
         }
 
-        // Section Title: Quick Actions
         Text(
             text = "الخدمات الرئيسية (POS)",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
         )
 
         // Services Grid
@@ -279,6 +281,7 @@ fun DashboardScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(menuItems) { item ->
+                val primaryColor = item.id.toServiceColor()
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -304,29 +307,27 @@ fun DashboardScreen(
                                 modifier = Modifier
                                     .size(40.dp)
                                     .clip(CircleShape)
-                                    .background(item.primaryColor.copy(alpha = 0.15f)),
+                                    .background(primaryColor.copy(alpha = 0.15f)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = item.icon,
                                     contentDescription = null,
-                                    tint = item.primaryColor,
+                                    tint = primaryColor,
                                     modifier = Modifier.size(22.dp)
                                 )
                             }
                         }
-
+ 
                         Column {
                             Text(
                                 text = item.title,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 14.sp,
-                                color = MaterialTheme.colorScheme.onSurface
+                                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
                             )
                             Text(
                                 text = item.subtitle,
-                                fontSize = 11.sp,
-                                color = Color.Gray,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 maxLines = 1
                             )
                         }

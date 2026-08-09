@@ -34,7 +34,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.ui.theme.PrimaryBlue
 import com.example.ui.viewmodel.MainTab
 import com.example.ui.viewmodel.SadadViewModel
 
@@ -72,7 +71,7 @@ fun MainScreen(viewModel: SadadViewModel) {
 
     if (merchantProfile == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(color = PrimaryBlue)
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
         return
     }

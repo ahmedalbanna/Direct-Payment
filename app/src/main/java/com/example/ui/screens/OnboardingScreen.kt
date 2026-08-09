@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ui.theme.PrimaryBlue
+import com.example.ui.theme.Typography
 import kotlinx.coroutines.launch
 
 data class OnboardingPage(
@@ -41,19 +41,19 @@ fun OnboardingScreen(onFinish: () -> Unit) {
             "شحن رصيد فوري",
             "اشحن رصيدك لجميع الشبكات المحلية (يمن موبايل، سبأفون، يو، واي) بضغطة زر واحدة.",
             Icons.Default.AccountBalanceWallet,
-            PrimaryBlue
+            MaterialTheme.colorScheme.primary
         ),
         OnboardingPage(
             "سداد الفواتير",
             "سدد فواتير الهاتف الثابت، الإنترنت ADSL، والخدمات العامة بكل سهولة وأمان.",
             Icons.Default.ReceiptLong,
-            Color(0xFF0D9488)
+            MaterialTheme.colorScheme.secondary
         ),
         OnboardingPage(
             "كروت الألعاب",
             "اشحن ألعابك المفضلة واشترِ الكروت الرقمية العالمية بأفضل الأسعار.",
             Icons.Default.SportsEsports,
-            Color(0xFFF59E0B)
+            MaterialTheme.colorScheme.tertiary
         )
     )
 
@@ -69,10 +69,9 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Page Indicator
                 Row {
                     repeat(pages.size) { iteration ->
-                        val color = if (pagerState.currentPage == iteration) PrimaryBlue else Color.LightGray
+                        val color = if (pagerState.currentPage == iteration) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
                         Box(
                             modifier = Modifier
                                 .padding(2.dp)
@@ -94,11 +93,11 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                         }
                     },
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
                     Text(
                         text = if (pagerState.currentPage == pages.size - 1) "ابدأ الآن" else "التالي",
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
                     )
                 }
             }
@@ -148,9 +147,8 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                 Text(
                     text = page.description,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = Color.Gray,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 24.sp
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
                 )
             }
         }

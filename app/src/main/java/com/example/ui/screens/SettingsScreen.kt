@@ -44,8 +44,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.MerchantProfile
-import com.example.ui.theme.ErrorRed
-import com.example.ui.theme.PrimaryBlue
 
 @Composable
 fun SettingsScreen(
@@ -94,13 +92,28 @@ fun SettingsScreen(
                 modifier = Modifier.padding(20.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(imageVector = Icons.Default.Person, contentDescription = null, tint = PrimaryBlue)
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
                 Spacer(modifier = Modifier.padding(4.dp))
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(text = "عرض ملف المتجر الشخصي", fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                    Text(text = "الاسم، الرصيد، إحصائيات الحساب", fontSize = 12.sp, color = Color.Gray)
+                    Text(
+                        text = "عرض ملف المتجر الشخصي",
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                    )
+                    Text(
+                        text = "الاسم، الرصيد، إحصائيات الحساب",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
-                Icon(imageVector = Icons.Default.ArrowForward, contentDescription = null, tint = Color.LightGray)
+                Icon(
+                    imageVector = Icons.Default.ArrowForward,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                )
             }
         }
 
@@ -115,14 +128,21 @@ fun SettingsScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(imageVector = Icons.Default.Security, contentDescription = null, tint = PrimaryBlue)
+                    Icon(
+                        imageVector = Icons.Default.Security,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                     Spacer(modifier = Modifier.padding(4.dp))
-                    Text(text = "تغيير رمز PIN الأمني السريع", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    Text(
+                        text = "تغيير رمز PIN الأمني السريع",
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                    )
                 }
 
                 Text(
                     text = "الرمز الحالي المسجل: ${merchantProfile?.securityPin ?: "1234"}",
-                    fontSize = 12.sp,
+                    style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
 
@@ -149,9 +169,12 @@ fun SettingsScreen(
                         .fillMaxWidth()
                         .testTag("save_new_pin_button"),
                     enabled = newPinText.length >= 4,
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text("حفظ رمز PIN الجديد", fontWeight = FontWeight.Bold)
+                    Text(
+                        "حفظ رمز PIN الجديد",
+                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                    )
                 }
             }
         }
@@ -167,9 +190,16 @@ fun SettingsScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(imageVector = Icons.Default.AddCard, contentDescription = null, tint = PrimaryBlue)
+                    Icon(
+                        imageVector = Icons.Default.AddCard,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                     Spacer(modifier = Modifier.padding(4.dp))
-                    Text(text = "تغذية رصيد المحل (إيداع تجريبي)", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    Text(
+                        text = "تغذية رصيد المحل (إيداع تجريبي)",
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                    )
                 }
 
                 OutlinedTextField(
@@ -181,7 +211,7 @@ fun SettingsScreen(
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     shape = RoundedCornerShape(14.dp),
-                    suffix = { Text("ريال") }
+                    suffix = { Text("ريال", style = MaterialTheme.typography.bodyMedium) }
                 )
 
                 val depositVal = depositText.toDoubleOrNull() ?: 0.0
@@ -191,9 +221,12 @@ fun SettingsScreen(
                         .fillMaxWidth()
                         .testTag("add_deposit_button"),
                     enabled = depositVal > 0,
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text("تغذية الحساب بـ $depositVal ريال", fontWeight = FontWeight.Bold)
+                    Text(
+                        "تغذية الحساب بـ $depositVal ريال",
+                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                    )
                 }
             }
         }
@@ -214,14 +247,13 @@ fun SettingsScreen(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "محاكاة فشل الـ API والاسترجاع الآلي",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp,
-                        color = ErrorRed
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.error
                     )
                     Text(
                         text = "عند التفعيل، سيفشل الاتصال بالشبكة تلقائياً ويعاد المبلغ لحسابك فوراً للإثبات",
-                        fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }
@@ -229,7 +261,10 @@ fun SettingsScreen(
                 Switch(
                     checked = merchantProfile?.simulateApiFailures == true,
                     onCheckedChange = { onToggleSimulateFailure(it) },
-                    colors = SwitchDefaults.colors(checkedThumbColor = ErrorRed, checkedTrackColor = ErrorRed.copy(alpha = 0.3f)),
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.error,
+                        checkedTrackColor = MaterialTheme.colorScheme.errorContainer
+                    ),
                     modifier = Modifier.testTag("simulate_failure_switch")
                 )
             }

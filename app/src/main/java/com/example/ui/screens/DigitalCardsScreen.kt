@@ -52,7 +52,6 @@ import androidx.compose.ui.unit.sp
 import com.example.data.model.DigitalCardItem
 import com.example.data.model.ServiceCatalogData
 import com.example.data.model.ServiceType
-import com.example.ui.theme.PrimaryBlue
 import com.example.ui.viewmodel.PendingTransaction
 
 enum class DigitalCardsStep {
@@ -110,8 +109,8 @@ fun DigitalCardsScreen(
                             DigitalCardsStep.ENTER_DETAILS -> "خطوة 2: أدخل معرف اللاعب"
                             DigitalCardsStep.CONFIRMATION -> "خطوة 3: مراجعة الشراء"
                         },
-                        fontSize = 12.sp,
-                        color = PrimaryBlue
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -128,8 +127,7 @@ fun DigitalCardsScreen(
                 DigitalCardsStep.SELECT_CARD -> {
                     Text(
                         text = "اختر البطاقة أو اللعبة المطلوبة:",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
                     cards.forEach { card ->
                         Card(
@@ -164,13 +162,20 @@ fun DigitalCardsScreen(
                                     }
                                     Spacer(modifier = Modifier.width(16.dp))
                                     Column {
-                                        Text(text = card.nameAr, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                                        Text(text = "الفئة: ${card.valueLabel}", fontSize = 12.sp, color = Color.Gray)
+                                        Text(
+                                            text = card.nameAr,
+                                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                                        )
+                                        Text(
+                                            text = "الفئة: ${card.valueLabel}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
                                     }
                                 }
                                 Text(
                                     text = "${card.priceYer.toInt()} ريال",
-                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                                     color = card.primaryColor
                                 )
                             }
@@ -181,19 +186,21 @@ fun DigitalCardsScreen(
                 DigitalCardsStep.ENTER_DETAILS -> {
                     Text(
                         text = "أدخل بيانات المستفيد لـ ${selectedCard.nameAr}:",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                     ) {
-                        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Column(
+                            modifier = Modifier.padding(20.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
                             Text(
                                 text = "يرجى إدخال معرف اللاعب (ID) أو رقم العميل بدقة لضمان وصول الشحن.",
-                                fontSize = 12.sp,
-                                color = Color.Gray
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             
                             OutlinedTextField(
@@ -228,8 +235,7 @@ fun DigitalCardsScreen(
                 DigitalCardsStep.CONFIRMATION -> {
                     Text(
                         text = "مراجعة تفاصيل الطلب:",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
 
                     Card(
@@ -237,18 +243,31 @@ fun DigitalCardsScreen(
                         shape = RoundedCornerShape(24.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                     ) {
-                        Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Column(
+                            modifier = Modifier.padding(24.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
                             DetailRowItem("المنتج:", selectedCard.nameAr, selectedCard.primaryColor)
                             DetailRowItem("الفئة:", selectedCard.valueLabel)
-                            DetailRowItem("معرف المستفيد:", if (playerId.isBlank()) "شحن كود مباشر" else playerId)
-                            DetailRowItem("سعر الشراء:", "${selectedCard.priceYer.toInt()} ريال", fontWeight = FontWeight.ExtraBold)
-                            
-                            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = Color.Gray.copy(alpha = 0.1f))
-                            
+                            DetailRowItem(
+                                "معرف المستفيد:",
+                                if (playerId.isBlank()) "شحن كود مباشر" else playerId
+                            )
+                            DetailRowItem(
+                                "سعر الشراء:",
+                                "${selectedCard.priceYer.toInt()} ريال",
+                                fontWeight = FontWeight.ExtraBold
+                            )
+
+                            HorizontalDivider(
+                                modifier = Modifier.padding(vertical = 8.dp),
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                            )
+
                             Text(
                                 text = "عند النقر على تأكيد، سيتم خصم المبلغ وتوليد كود البطاقة فوراً.",
-                                fontSize = 11.sp,
-                                color = Color.Gray,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth()
                             )
@@ -279,7 +298,10 @@ fun DigitalCardsScreen(
                         shape = RoundedCornerShape(18.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = selectedCard.primaryColor)
                     ) {
-                        Text("تأكيد الشراء الآن (${selectedCard.priceYer.toInt()} ريال)", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            "تأكيد الشراء الآن (${selectedCard.priceYer.toInt()} ريال)",
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                        )
                     }
                 }
             }
@@ -288,10 +310,23 @@ fun DigitalCardsScreen(
 }
 
 @Composable
-fun DetailRowItem(label: String, value: String, valueColor: Color = MaterialTheme.colorScheme.onSurface, fontWeight: FontWeight = FontWeight.Bold) {
+fun DetailRowItem(
+    label: String,
+    value: String,
+    valueColor: Color = MaterialTheme.colorScheme.onSurface,
+    fontWeight: FontWeight = FontWeight.Bold
+) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(text = label, color = Color.Gray, fontSize = 14.sp)
-        Text(text = value, color = valueColor, fontWeight = fontWeight, fontSize = 15.sp)
+        Text(
+            text = label,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Text(
+            text = value,
+            color = valueColor,
+            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = fontWeight)
+        )
     }
 }
 

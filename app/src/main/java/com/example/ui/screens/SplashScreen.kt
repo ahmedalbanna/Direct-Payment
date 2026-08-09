@@ -23,8 +23,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.ui.theme.PrimaryBlue
 import kotlinx.coroutines.delay
 
 @Composable
@@ -43,7 +41,7 @@ fun SplashScreen(onFinish: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(PrimaryBlue),
+            .background(MaterialTheme.colorScheme.primary),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -53,21 +51,18 @@ fun SplashScreen(onFinish: () -> Unit) {
                 modifier = Modifier
                     .size(120.dp)
                     .scale(scale.value),
-                tint = Color.White
+                tint = MaterialTheme.colorScheme.onPrimary
             )
             Spacer(modifier = Modifier.height(24.dp))
             Text(
                 text = "سداد كاش",
-                color = Color.White,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold,
-                style = MaterialTheme.typography.displayMedium
+                color = MaterialTheme.colorScheme.onPrimary,
+                style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.ExtraBold)
             )
             Text(
                 text = "ثقة . سرعة . أمان",
-                color = Color.White.copy(alpha = 0.8f),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium
+                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium)
             )
         }
     }

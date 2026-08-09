@@ -56,7 +56,6 @@ import com.example.data.model.ServiceCatalogData
 import com.example.data.model.ServiceType
 import com.example.data.model.TelecomNetwork
 import com.example.data.model.TelecomPackage
-import com.example.ui.theme.PrimaryBlue
 import com.example.ui.viewmodel.PendingTransaction
 
 enum class RechargeStep {
@@ -134,8 +133,8 @@ fun RechargeScreen(
                             RechargeStep.SELECT_PACKAGE -> "خطوة 3: اختر الباقة أو المبلغ"
                             RechargeStep.CONFIRMATION -> "خطوة 4: مراجعة العملية"
                         },
-                        fontSize = 12.sp,
-                        color = PrimaryBlue
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -152,8 +151,7 @@ fun RechargeScreen(
                 RechargeStep.SELECT_NETWORK -> {
                     Text(
                         text = "اختر الشبكة المراد شحنها:",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
                     networks.forEach { network ->
                         Card(
@@ -187,14 +185,20 @@ fun RechargeScreen(
                                         Text(
                                             text = network.nameAr.take(1),
                                             color = network.primaryColor,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 20.sp
+                                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                                         )
                                     }
                                     Spacer(modifier = Modifier.width(16.dp))
                                     Column {
-                                        Text(text = network.nameAr, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                                        Text(text = "البادئات: ${network.prefixList.joinToString(", ")}", fontSize = 12.sp, color = Color.Gray)
+                                        Text(
+                                            text = network.nameAr,
+                                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                                        )
+                                        Text(
+                                            text = "البادئات: ${network.prefixList.joinToString(", ")}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
                                     }
                                 }
                                 if (selectedNetwork.id == network.id) {
@@ -208,8 +212,7 @@ fun RechargeScreen(
                 RechargeStep.ENTER_PHONE -> {
                     Text(
                         text = "أدخل رقم هاتف ${selectedNetwork.nameAr}:",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -238,7 +241,11 @@ fun RechargeScreen(
                             )
 
                             // Quick Phone Chips
-                            Text(text = "أرقام سريعة:", fontSize = 12.sp, color = Color.Gray)
+                            Text(
+                                text = "أرقام سريعة:",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -250,12 +257,15 @@ fun RechargeScreen(
                                             autoSelectNetworkByPhone(quickNum)
                                         },
                                         shape = RoundedCornerShape(8.dp),
-                                        color = MaterialTheme.colorScheme.background,
-                                        border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray.copy(alpha = 0.2f))
+                                        color = MaterialTheme.colorScheme.surfaceVariant,
+                                        border = androidx.compose.foundation.BorderStroke(
+                                            1.dp,
+                                            MaterialTheme.colorScheme.outlineVariant
+                                        )
                                     ) {
                                         Text(
                                             text = quickNum,
-                                            fontSize = 12.sp,
+                                            style = MaterialTheme.typography.labelMedium,
                                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
                                         )
                                     }
@@ -280,8 +290,7 @@ fun RechargeScreen(
                 RechargeStep.SELECT_PACKAGE -> {
                     Text(
                         text = "اختر الباقة لـ $phoneNumber:",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
 
                     // Custom Amount First
@@ -299,7 +308,10 @@ fun RechargeScreen(
                         border = if (selectedPackage == null) androidx.compose.foundation.BorderStroke(2.dp, selectedNetwork.primaryColor) else null
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Text(text = "شحن رصيد مباشر (مبلغ مخصص)", fontWeight = FontWeight.Bold)
+                            Text(
+                                text = "شحن رصيد مباشر (مبلغ مخصص)",
+                                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+                            )
                             Spacer(modifier = Modifier.height(8.dp))
                             OutlinedTextField(
                                 value = amountText,
@@ -308,13 +320,17 @@ fun RechargeScreen(
                                 singleLine = true,
                                 placeholder = { Text("أدخل المبلغ يدوياً") },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                suffix = { Text("ريال") },
+                                suffix = { Text("ريال", style = MaterialTheme.typography.bodyMedium) },
                                 shape = RoundedCornerShape(12.dp)
                             )
                         }
                     }
 
-                    Text(text = "أو اختر باقة جاهزة:", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color.Gray)
+                    Text(
+                        text = "أو اختر باقة جاهزة:",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
 
                     filteredPackages.forEach { pkg ->
                         Card(
@@ -338,13 +354,20 @@ fun RechargeScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
-                                    Text(text = pkg.titleAr, fontWeight = FontWeight.Bold)
-                                    Text(text = pkg.descriptionAr, fontSize = 11.sp, color = Color.Gray)
+                                    Text(
+                                        text = pkg.titleAr,
+                                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                                    )
+                                    Text(
+                                        text = pkg.descriptionAr,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
                                 }
                                 Text(
                                     text = "${pkg.priceYer.toInt()} ريال",
                                     color = selectedNetwork.primaryColor,
-                                    fontWeight = FontWeight.Bold
+                                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                                 )
                             }
                         }
@@ -366,8 +389,7 @@ fun RechargeScreen(
                 RechargeStep.CONFIRMATION -> {
                     Text(
                         text = "مراجعة تفاصيل العملية:",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
 
                     Card(
@@ -392,7 +414,7 @@ fun RechargeScreen(
                             ) {
                                 Text(
                                     text = "يرجى التأكد من صحة الرقم قبل التأكيد. سيتم خصم المبلغ من رصيدك فوراً.",
-                                    fontSize = 11.sp,
+                                    style = MaterialTheme.typography.labelSmall,
                                     color = selectedNetwork.primaryColor,
                                     textAlign = TextAlign.Center,
                                     modifier = Modifier.fillMaxWidth()
@@ -423,7 +445,10 @@ fun RechargeScreen(
                         shape = RoundedCornerShape(18.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = selectedNetwork.primaryColor)
                     ) {
-                        Text("تأكيد العملية الآن ($parsedAmount ريال)", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            "تأكيد العملية الآن ($parsedAmount ريال)",
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                        )
                     }
                 }
             }
@@ -432,10 +457,23 @@ fun RechargeScreen(
 }
 
 @Composable
-fun DetailRow(label: String, value: String, valueColor: Color = MaterialTheme.colorScheme.onSurface, fontWeight: FontWeight = FontWeight.Bold) {
+fun DetailRow(
+    label: String,
+    value: String,
+    valueColor: Color = MaterialTheme.colorScheme.onSurface,
+    fontWeight: FontWeight = FontWeight.Bold
+) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(text = label, color = Color.Gray, fontSize = 14.sp)
-        Text(text = value, color = valueColor, fontWeight = fontWeight, fontSize = 15.sp)
+        Text(
+            text = label,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Text(
+            text = value,
+            color = valueColor,
+            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = fontWeight)
+        )
     }
 }
 
