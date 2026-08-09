@@ -113,8 +113,8 @@ fun DashboardScreen(
         ),
         ActionMenuItem(
             id = MainTab.SETTINGS,
-            title = "إعدادات الأمان",
-            subtitle = "تغيير الـ PIN وإدارة الحساب",
+            title = "الإعدادات والتحكم",
+            subtitle = "إدارة الحساب، الأمان، وأدوات المتجر",
             icon = Icons.Default.Settings
         )
     )
