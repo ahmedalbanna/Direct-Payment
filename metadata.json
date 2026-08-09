@@ -1,5 +1,5 @@
 {
-  "name": "سداد كاش",
+  "name": "الجنوب سداد",
   "description": "منصة وسيطة لتعبئة الرصيد وسداد الفواتير والكروت الرقمية وإدارة الحسابات والمالية للوكلاء والمحلات في اليمن",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

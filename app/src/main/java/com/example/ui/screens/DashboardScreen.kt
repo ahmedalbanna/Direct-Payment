@@ -134,11 +134,11 @@ fun DashboardScreen(
         ) {
             Column {
                 Text(
-                    text = merchantProfile?.merchantName ?: "محلات الباشا للخدمات",
+                    text = merchantProfile?.merchantName ?: "محلات عقبات للخدمات والاتصالات",
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
                 Text(
-                    text = "رمز الوكيل: ${merchantProfile?.agentCode ?: "POS-9941"} • ${merchantProfile?.phone ?: ""}",
+                    text = "رمز الوكيل: ${merchantProfile?.agentCode ?: "131819"} • ${merchantProfile?.phone ?: ""}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

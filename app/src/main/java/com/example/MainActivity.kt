@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import com.example.ui.screens.MainScreen
-import com.example.ui.theme.SadadProTheme
+import com.example.ui.theme.AlJanoubSadadTheme
 import com.example.ui.viewmodel.SadadViewModel
 
 class MainActivity : ComponentActivity() {
@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
     setContent {
-      SadadProTheme {
+      AlJanoubSadadTheme {
         MainScreen(viewModel = viewModel)
       }
     }

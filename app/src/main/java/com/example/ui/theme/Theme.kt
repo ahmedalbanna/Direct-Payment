@@ -75,7 +75,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun SadadProTheme(
+fun AlJanoubSadadTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {

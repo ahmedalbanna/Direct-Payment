@@ -55,7 +55,7 @@ fun SplashScreen(onFinish: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                text = "سداد كاش",
+                text = "الجنوب سداد",
                 color = MaterialTheme.colorScheme.onPrimary,
                 style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.ExtraBold)
             )

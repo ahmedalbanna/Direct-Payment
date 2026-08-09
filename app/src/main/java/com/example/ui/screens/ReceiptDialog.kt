@@ -321,7 +321,7 @@ fun ReceiptDialog(
                                 Text("الحالة: ${if (isSuccess) "ناجحة SUCCESS" else "فاشلة FAILED"}", fontWeight = FontWeight.Bold)
                                 Spacer(modifier = Modifier.height(16.dp))
                                 Text("شكراً لتعاملكم معنا", fontSize = 11.sp)
-                                Text("* سداد كاش - الأمان والسرعة *", fontSize = 10.sp)
+                                Text("* الجنوب سداد - الأمان والسرعة *", fontSize = 10.sp)
                             }
                         }
                     }
@@ -349,7 +349,7 @@ fun ReceiptDialog(
                     Button(
                         onClick = {
                             val shareText = """
-                                🧾 *سند سداد كاش - $merchantName*
+                                🧾 *سند الجنوب سداد - $merchantName*
                                 -----------------------------
                                 📌 رقم العملية: ${transaction.transactionCode}
                                 🗓️ التاريخ: $formattedDate

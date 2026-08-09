@@ -85,7 +85,7 @@ fun LockScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                text = "سداد المباشر (POS)",
+                text = "الجنوب سداد (POS)",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.ExtraBold,
                 color = MaterialTheme.colorScheme.primary

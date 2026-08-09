@@ -37,9 +37,9 @@ class SadadRepository(
         var profile = merchantDao.getMerchantSync()
         if (profile == null) {
             profile = MerchantProfile(
-                merchantName = "محلات الباشا للخدمات والاتصالات",
-                phone = "777123456",
-                agentCode = "POS-9941",
+                merchantName = "محلات عقبات للخدمات والاتصالات",
+                phone = "783131819",
+                agentCode = "131819",
                 balance = 350000.0,
                 securityPin = "1234",
                 isLocked = false

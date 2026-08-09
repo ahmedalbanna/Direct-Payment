@@ -84,7 +84,7 @@ fun MainScreen(viewModel: SadadViewModel) {
 
     if (!isLoggedIn) {
         LoginScreen(
-            merchantName = merchantProfile?.merchantName ?: "سداد كاش",
+            merchantName = merchantProfile?.merchantName ?: "الجنوب سداد",
             onLoginSuccess = { viewModel.login() }
         )
         return
@@ -92,7 +92,7 @@ fun MainScreen(viewModel: SadadViewModel) {
 
     if (merchantProfile?.isLocked == true) {
         LockScreen(
-            merchantName = merchantProfile?.merchantName ?: "سداد المباشر",
+            merchantName = merchantProfile?.merchantName ?: "الجنوب سداد",
             onUnlock = { pin, onSuccess, onError ->
                 viewModel.unlockPos(pin, onSuccess, onError)
             }
@@ -178,8 +178,8 @@ fun MainScreen(viewModel: SadadViewModel) {
             if (receiptTx != null) {
                 ReceiptDialog(
                     transaction = receiptTx!!,
-                    merchantName = merchantProfile?.merchantName ?: "محلات الباشا للاتصالات",
-                    merchantPhone = merchantProfile?.phone ?: "777123456",
+                    merchantName = merchantProfile?.merchantName ?: "محلات عقبات للخدمات والاتصالات",
+                    merchantPhone = merchantProfile?.phone ?: "783131819",
                     onDismiss = { viewModel.dismissReceipt() }
                 )
             }

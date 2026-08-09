@@ -108,7 +108,7 @@ fun ProfileScreen(
                         color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
                     ) {
                         Text(
-                            text = "وكيل معتمد: ${profile.agentCode ?: "POS-9941"}",
+                            text = "وكيل معتمد: ${profile.agentCode ?: "POS-131819"}",
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary
