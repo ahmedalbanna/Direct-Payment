@@ -34,6 +34,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +44,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +56,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.ServiceCatalogData
@@ -62,6 +65,12 @@ import com.example.data.repository.BillInquiryResult
 import com.example.ui.theme.PrimaryBlue
 import com.example.ui.theme.SuccessGreen
 import com.example.ui.viewmodel.PendingTransaction
+
+enum class BillsStep {
+    SELECT_SERVICE,
+    ENTER_ACCOUNT,
+    REVIEW_AND_PAY
+}
 
 @Composable
 fun BillsScreen(
@@ -73,9 +82,18 @@ fun BillsScreen(
     onSubmitBillPay: (PendingTransaction) -> Unit
 ) {
     val services = ServiceCatalogData.billServices
+    var currentStep by remember { mutableStateOf(BillsStep.SELECT_SERVICE) }
     var selectedService by remember { mutableStateOf(services.first()) }
     var accountId by remember { mutableStateOf("") }
     var payAmountText by remember { mutableStateOf("") }
+
+    // Auto-advance to Review step when inquiry result is received
+    LaunchedEffect(inquiryResult) {
+        if (inquiryResult != null && currentStep == BillsStep.ENTER_ACCOUNT) {
+            currentStep = BillsStep.REVIEW_AND_PAY
+            payAmountText = inquiryResult.dueAmountYer.toInt().toString()
+        }
+    }
 
     val iconForCategory = when (selectedService.id) {
         "landline" -> Icons.Default.Phone
@@ -89,223 +107,265 @@ fun BillsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState())
-            .testTag("bills_screen"),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .background(MaterialTheme.colorScheme.background)
+            .testTag("bills_screen")
     ) {
-        // Header Top
-        Row(
+        // Top Custom Header with Step Logic
+        Surface(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            color = MaterialTheme.colorScheme.surface,
+            shadowElevation = 2.dp
         ) {
-            IconButton(onClick = onBack) {
-                Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "رجوع")
-            }
-            Text(
-                text = "سداد الفواتير والاشتراكات",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-
-        // Services Chips
-        Text(text = "اختر الخدمة المطلوب سدادها:", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            services.forEach { service ->
-                val isSelected = service.id == selectedService.id
-                Surface(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(80.dp)
-                        .clickable {
-                            selectedService = service
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = {
+                    when (currentStep) {
+                        BillsStep.SELECT_SERVICE -> onBack()
+                        BillsStep.ENTER_ACCOUNT -> currentStep = BillsStep.SELECT_SERVICE
+                        BillsStep.REVIEW_AND_PAY -> {
+                            currentStep = BillsStep.ENTER_ACCOUNT
                             onClearInquiry()
-                            payAmountText = ""
-                        }
-                        .testTag("bill_service_chip_${service.id}"),
-                    shape = RoundedCornerShape(16.dp),
-                    color = if (isSelected) service.primaryColor else MaterialTheme.colorScheme.surface,
-                    border = if (!isSelected) androidx.compose.foundation.BorderStroke(1.dp, Color.Gray.copy(alpha = 0.3f)) else null
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(6.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = service.nameAr,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 11.sp,
-                            color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
-                            maxLines = 2
-                        )
-                    }
-                }
-            }
-        }
-
-        // Account / Line Number Card with Inquiry Button
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    text = "رقم حساب / هاتف الخدمة (${selectedService.nameAr}):",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp
-                )
-
-                OutlinedTextField(
-                    value = accountId,
-                    onValueChange = {
-                        accountId = it
-                        onClearInquiry()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("bill_account_input"),
-                    singleLine = true,
-                    placeholder = { Text("أدخل رقم الحساب أو الرقم الثابت") },
-                    leadingIcon = { Icon(imageVector = iconForCategory, contentDescription = null, tint = selectedService.primaryColor) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    shape = RoundedCornerShape(14.dp)
-                )
-
-                // Instant Inquiry Button (استعلام عن الفاتورة)
-                OutlinedButton(
-                    onClick = { onInquireBill(selectedService.id, accountId) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .testTag("inquire_bill_button"),
-                    enabled = accountId.isNotBlank() && !isInquiring,
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    if (isInquiring) {
-                        CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("جاري الاستعلام اللحظي من الخادم...")
-                    } else {
-                        Icon(imageVector = Icons.Default.Search, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("استعلام عن المستحق واسم المشترك")
-                    }
-                }
-            }
-        }
-
-        // Inquiry Result Panel
-        AnimatedVisibility(visible = inquiryResult != null) {
-            if (inquiryResult != null) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("inquiry_result_card"),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = SuccessGreen.copy(alpha = 0.1f)),
-                    border = androidx.compose.foundation.BorderStroke(1.5.dp, SuccessGreen)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(imageVector = Icons.Default.CheckCircle, contentDescription = null, tint = SuccessGreen)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = "نتيجة الاستعلام اللحظي ناجحة", fontWeight = FontWeight.Bold, color = SuccessGreen)
-                        }
-
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text(text = "اسم المشترك المسجل:", color = Color.Gray, fontSize = 13.sp)
-                            Text(text = inquiryResult.subscriberName, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                        }
-
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text(text = "المبلغ المستحق حالياً:", color = Color.Gray, fontSize = 13.sp)
-                            Text(text = "${inquiryResult.dueAmountYer} ريال", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
-                        }
-
-                        Button(
-                            onClick = { payAmountText = inquiryResult.dueAmountYer.toInt().toString() },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 4.dp),
-                            shape = RoundedCornerShape(10.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = SuccessGreen)
-                        ) {
-                            Text("اعتماد المبلغ المستحق ($payAmountText ريال)", fontSize = 12.sp)
                         }
                     }
+                }) {
+                    Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "رجوع")
                 }
-            }
-        }
-
-        // Payment Amount Box
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(text = "مبلغ السداد (ريال يمني):", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                OutlinedTextField(
-                    value = payAmountText,
-                    onValueChange = { payAmountText = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("bill_pay_amount_input"),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    shape = RoundedCornerShape(14.dp),
-                    suffix = { Text("ريال") }
-                )
-            }
-        }
-
-        val parsedAmount = payAmountText.toDoubleOrNull() ?: 0.0
-        Button(
-            onClick = {
-                onSubmitBillPay(
-                    PendingTransaction(
-                        serviceType = ServiceType.BILL,
-                        serviceName = "سداد فاتورة ${selectedService.nameAr}",
-                        providerCategory = selectedService.nameAr,
-                        targetNumber = accountId,
-                        amount = parsedAmount,
-                        cost = parsedAmount * 0.99,
-                        subscriberName = inquiryResult?.subscriberName
+                Column {
+                    Text(
+                        text = "سداد الفواتير والاشتراكات",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
                     )
-                )
-            },
+                    Text(
+                        text = when (currentStep) {
+                            BillsStep.SELECT_SERVICE -> "الخطوة 1: اختر نوع الخدمة"
+                            BillsStep.ENTER_ACCOUNT -> "الخطوة 2: أدخل بيانات الحساب"
+                            BillsStep.REVIEW_AND_PAY -> "الخطوة 3: المراجعة والدفع"
+                        },
+                        fontSize = 12.sp,
+                        color = PrimaryBlue
+                    )
+                }
+            }
+        }
+
+        // Progress Stepper
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(54.dp)
-                .testTag("submit_bill_pay_button"),
-            enabled = accountId.isNotBlank() && parsedAmount > 0,
-            colors = ButtonDefaults.buttonColors(containerColor = selectedService.primaryColor),
-            shape = RoundedCornerShape(16.dp)
+                .padding(top = 12.dp, bottom = 8.dp),
+            horizontalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = "سداد الفاتورة بـ PIN ($parsedAmount ريال)",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
+            BillsStep.entries.forEach { step ->
+                val isCompleted = step.ordinal < currentStep.ordinal
+                val isCurrent = step == currentStep
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .height(4.dp)
+                        .width(60.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (isCurrent) PrimaryBlue 
+                            else if (isCompleted) PrimaryBlue.copy(alpha = 0.4f) 
+                            else Color.Gray.copy(alpha = 0.15f)
+                        )
+                )
+            }
         }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            when (currentStep) {
+                BillsStep.SELECT_SERVICE -> {
+                    Text(
+                        text = "اختر الخدمة المطلوب سدادها:",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+
+                    services.forEach { service ->
+                        val isSelected = service.id == selectedService.id
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(72.dp)
+                                .clickable {
+                                    selectedService = service
+                                    currentStep = BillsStep.ENTER_ACCOUNT
+                                },
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                            border = if (isSelected) androidx.compose.foundation.BorderStroke(2.dp, service.primaryColor) else null
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
+                                    modifier = Modifier.size(40.dp).clip(CircleShape).background(service.primaryColor.copy(alpha = 0.1f)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = when(service.id) {
+                                            "landline" -> Icons.Default.Phone
+                                            "adsl" -> Icons.Default.Wifi
+                                            else -> Icons.Default.ReceiptLong
+                                        },
+                                        contentDescription = null,
+                                        tint = service.primaryColor,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Text(text = service.nameAr, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                                Spacer(modifier = Modifier.weight(1f))
+                                Icon(imageVector = Icons.Default.CheckCircle, contentDescription = null, tint = if (isSelected) service.primaryColor else Color.Transparent)
+                            }
+                        }
+                    }
+                }
+
+                BillsStep.ENTER_ACCOUNT -> {
+                    Text(
+                        text = "بيانات الحساب لخدمة ${selectedService.nameAr}:",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    ) {
+                        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            OutlinedTextField(
+                                value = accountId,
+                                onValueChange = {
+                                    accountId = it
+                                    onClearInquiry()
+                                },
+                                modifier = Modifier.fillMaxWidth().testTag("bill_account_input_wizard"),
+                                label = { Text("رقم الحساب / الهاتف الثابت") },
+                                leadingIcon = { Icon(imageVector = iconForCategory, contentDescription = null, tint = selectedService.primaryColor) },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                shape = RoundedCornerShape(14.dp)
+                            )
+
+                            Button(
+                                onClick = { onInquireBill(selectedService.id, accountId) },
+                                modifier = Modifier.fillMaxWidth().height(54.dp).testTag("inquire_bill_button_wizard"),
+                                enabled = accountId.length >= 3 && !isInquiring,
+                                shape = RoundedCornerShape(16.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = selectedService.primaryColor)
+                            ) {
+                                if (isInquiring) {
+                                    CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 3.dp, color = Color.White)
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text("جاري الاستعلام...")
+                                } else {
+                                    Icon(imageVector = Icons.Default.Search, contentDescription = null)
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("استعلام عن المستحق")
+                                }
+                            }
+                        }
+                    }
+                }
+
+                BillsStep.REVIEW_AND_PAY -> {
+                    Text(
+                        text = "تفاصيل المشترك والمبلغ المستحق:",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = CardDefaults.cardColors(containerColor = SuccessGreen.copy(alpha = 0.05f)),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, SuccessGreen.copy(alpha = 0.3f))
+                    ) {
+                        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(imageVector = Icons.Default.CheckCircle, contentDescription = null, tint = SuccessGreen)
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(text = "تم جلب البيانات بنجاح", color = SuccessGreen, fontWeight = FontWeight.Bold)
+                            }
+                            HorizontalDivider(color = Color.Gray.copy(alpha = 0.1f))
+                            DetailInfoRow("اسم المشترك:", inquiryResult?.subscriberName ?: "غير متوفر")
+                            DetailInfoRow("المبلغ المستحق:", "${inquiryResult?.dueAmountYer ?: 0.0} ريال", isPrice = true)
+                        }
+                    }
+
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    ) {
+                        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(text = "مبلغ السداد المطلوب:", fontWeight = FontWeight.Bold)
+                            OutlinedTextField(
+                                value = payAmountText,
+                                onValueChange = { payAmountText = it },
+                                modifier = Modifier.fillMaxWidth().testTag("bill_pay_amount_input_wizard"),
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                shape = RoundedCornerShape(14.dp),
+                                suffix = { Text("ريال") }
+                            )
+                        }
+                    }
+
+                    val parsedAmount = payAmountText.toDoubleOrNull() ?: 0.0
+                    Button(
+                        onClick = {
+                            onSubmitBillPay(
+                                PendingTransaction(
+                                    serviceType = ServiceType.BILL,
+                                    serviceName = "سداد فاتورة ${selectedService.nameAr}",
+                                    providerCategory = selectedService.nameAr,
+                                    targetNumber = accountId,
+                                    amount = parsedAmount,
+                                    cost = parsedAmount * 0.99,
+                                    subscriberName = inquiryResult?.subscriberName
+                                )
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth().height(58.dp).testTag("submit_bill_pay_button_wizard"),
+                        enabled = parsedAmount > 0,
+                        shape = RoundedCornerShape(18.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = selectedService.primaryColor)
+                    ) {
+                        Text("تأكيد السداد الآن ($parsedAmount ريال)", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DetailInfoRow(label: String, value: String, isPrice: Boolean = false) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, color = Color.Gray, fontSize = 13.sp)
+        Text(
+            text = value,
+            fontWeight = FontWeight.Bold,
+            fontSize = if (isPrice) 16.sp else 14.sp,
+            color = if (isPrice) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+        )
     }
 }
