@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCard
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.LockReset
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -35,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -51,7 +53,8 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onChangePin: (String) -> Unit,
     onAddDeposit: (Double) -> Unit,
-    onToggleSimulateFailure: (Boolean) -> Unit
+    onToggleSimulateFailure: (Boolean) -> Unit,
+    onNavigateToProfile: () -> Unit
 ) {
     var newPinText by remember { mutableStateOf("") }
     var depositText by remember { mutableStateOf("50000") }
@@ -78,6 +81,27 @@ fun SettingsScreen(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
+        }
+
+        // Profile Section
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            onClick = onNavigateToProfile
+        ) {
+            Row(
+                modifier = Modifier.padding(20.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(imageVector = Icons.Default.Person, contentDescription = null, tint = PrimaryBlue)
+                Spacer(modifier = Modifier.padding(4.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = "عرض ملف المتجر الشخصي", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    Text(text = "الاسم، الرصيد، إحصائيات الحساب", fontSize = 12.sp, color = Color.Gray)
+                }
+                Icon(imageVector = Icons.Default.ArrowForward, contentDescription = null, tint = Color.LightGray)
+            }
         }
 
         // Change PIN Card

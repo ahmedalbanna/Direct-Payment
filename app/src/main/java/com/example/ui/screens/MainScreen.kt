@@ -9,9 +9,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PhonelinkRing
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -25,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -50,6 +53,7 @@ fun MainScreen(viewModel: SadadViewModel) {
     val inquiryResult by viewModel.inquiryResult.collectAsStateWithLifecycle()
     val isInquiring by viewModel.isInquiring.collectAsStateWithLifecycle()
     val showSplash by viewModel.showSplash.collectAsStateWithLifecycle()
+    val isLoggedIn by viewModel.isLoggedIn.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -66,8 +70,23 @@ fun MainScreen(viewModel: SadadViewModel) {
         return
     }
 
-    if (merchantProfile != null && !merchantProfile!!.isOnboardingCompleted) {
+    if (merchantProfile == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = PrimaryBlue)
+        }
+        return
+    }
+
+    if (!merchantProfile!!.isOnboardingCompleted) {
         OnboardingScreen(onFinish = { viewModel.completeOnboarding() })
+        return
+    }
+
+    if (!isLoggedIn) {
+        LoginScreen(
+            merchantName = merchantProfile?.merchantName ?: "سداد كاش",
+            onLoginSuccess = { viewModel.login() }
+        )
         return
     }
 
@@ -132,7 +151,14 @@ fun MainScreen(viewModel: SadadViewModel) {
                         onBack = { viewModel.selectTab(MainTab.DASHBOARD) },
                         onChangePin = { viewModel.updateSecurityPin(it) },
                         onAddDeposit = { viewModel.addMerchantDeposit(it) },
-                        onToggleSimulateFailure = { viewModel.toggleSimulateFailure(it) }
+                        onToggleSimulateFailure = { viewModel.toggleSimulateFailure(it) },
+                        onNavigateToProfile = { viewModel.selectTab(MainTab.PROFILE) }
+                    )
+
+                    MainTab.PROFILE -> ProfileScreen(
+                        profile = merchantProfile!!,
+                        onBack = { viewModel.selectTab(MainTab.SETTINGS) },
+                        onLogout = { viewModel.logout() }
                     )
                 }
             }

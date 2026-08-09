@@ -23,7 +23,8 @@ enum class MainTab {
     BILLS,
     DIGITAL_CARDS,
     HISTORY,
-    SETTINGS
+    SETTINGS,
+    PROFILE
 }
 
 data class PendingTransaction(
@@ -75,6 +76,9 @@ class SadadViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _showSplash = MutableStateFlow(true)
     val showSplash: StateFlow<Boolean> = _showSplash.asStateFlow()
+
+    private val _isLoggedIn = MutableStateFlow(false)
+    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
 
     // Customer Ledger State
     init {
@@ -130,6 +134,15 @@ class SadadViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             repository.setOnboardingCompleted(true)
         }
+    }
+
+    fun login() {
+        _isLoggedIn.value = true
+    }
+
+    fun logout() {
+        _isLoggedIn.value = false
+        _activeTab.value = MainTab.DASHBOARD
     }
 
     // Direct Bill Inquiry
