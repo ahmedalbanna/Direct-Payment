@@ -73,6 +73,9 @@ class SadadViewModel(application: Application) : AndroidViewModel(application) {
     private val _isInquiring = MutableStateFlow(false)
     val isInquiring: StateFlow<Boolean> = _isInquiring.asStateFlow()
 
+    private val _showSplash = MutableStateFlow(true)
+    val showSplash: StateFlow<Boolean> = _showSplash.asStateFlow()
+
     // Customer Ledger State
     init {
         val db = AppDatabase.getDatabase(application)
@@ -117,6 +120,16 @@ class SadadViewModel(application: Application) : AndroidViewModel(application) {
 
     fun clearErrorMessage() {
         _errorMessage.value = null
+    }
+
+    fun completeSplash() {
+        _showSplash.value = false
+    }
+
+    fun completeOnboarding() {
+        viewModelScope.launch {
+            repository.setOnboardingCompleted(true)
+        }
     }
 
     // Direct Bill Inquiry

@@ -78,6 +78,11 @@ class SadadRepository(
         merchantDao.setSimulateFailure(simulate)
     }
 
+    suspend fun setOnboardingCompleted(completed: Boolean) {
+        val current = merchantDao.getMerchantSync() ?: return
+        merchantDao.insertOrUpdateProfile(current.copy(isOnboardingCompleted = completed))
+    }
+
     suspend fun addMerchantBalance(amount: Double) {
         val profile = merchantDao.getMerchantSync() ?: return
         val updated = profile.balance + amount

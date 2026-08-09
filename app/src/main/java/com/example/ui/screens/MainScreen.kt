@@ -49,6 +49,7 @@ fun MainScreen(viewModel: SadadViewModel) {
     val toastMessage by viewModel.toastMessage.collectAsStateWithLifecycle()
     val inquiryResult by viewModel.inquiryResult.collectAsStateWithLifecycle()
     val isInquiring by viewModel.isInquiring.collectAsStateWithLifecycle()
+    val showSplash by viewModel.showSplash.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -58,6 +59,16 @@ fun MainScreen(viewModel: SadadViewModel) {
             Toast.makeText(context, it, Toast.LENGTH_LONG).show()
             viewModel.clearToast()
         }
+    }
+
+    if (showSplash) {
+        SplashScreen(onFinish = { viewModel.completeSplash() })
+        return
+    }
+
+    if (merchantProfile != null && !merchantProfile!!.isOnboardingCompleted) {
+        OnboardingScreen(onFinish = { viewModel.completeOnboarding() })
+        return
     }
 
     if (merchantProfile?.isLocked == true) {

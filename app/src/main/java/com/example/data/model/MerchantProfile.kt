@@ -12,5 +12,6 @@ data class MerchantProfile(
     val balance: Double = 350000.0,
     val securityPin: String = "1234",
     val isLocked: Boolean = false,
+    val isOnboardingCompleted: Boolean = false,
     val simulateApiFailures: Boolean = false
 )
