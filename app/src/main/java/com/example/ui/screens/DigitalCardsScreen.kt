@@ -1,7 +1,9 @@
 package com.example.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,19 +11,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,10 +41,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.DigitalCardItem
@@ -47,159 +55,268 @@ import com.example.data.model.ServiceType
 import com.example.ui.theme.PrimaryBlue
 import com.example.ui.viewmodel.PendingTransaction
 
+enum class DigitalCardsStep {
+    SELECT_CARD,
+    ENTER_DETAILS,
+    CONFIRMATION
+}
+
 @Composable
 fun DigitalCardsScreen(
     onBack: () -> Unit,
     onSubmitCardPurchase: (PendingTransaction) -> Unit
 ) {
     val cards = ServiceCatalogData.digitalCards
+    var currentStep by remember { mutableStateOf(DigitalCardsStep.SELECT_CARD) }
     var selectedCard by remember { mutableStateOf(cards.first()) }
     var playerId by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState())
-            .testTag("digital_cards_screen"),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .background(MaterialTheme.colorScheme.background)
+            .testTag("digital_cards_screen")
     ) {
-        // Top Header
-        Row(
+        // Custom App Bar / Header
+        Surface(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            color = MaterialTheme.colorScheme.surface,
+            shadowElevation = 2.dp
         ) {
-            IconButton(onClick = onBack) {
-                Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "رجوع")
-            }
-            Text(
-                text = "شراء الكروت الرقمية والألعاب",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-
-        Text(
-            text = "اختر البطاقة الرقمية أو لعبة الشحن:",
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp
-        )
-
-        // Cards List
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            cards.forEach { card ->
-                val isSelected = card.id == selectedCard.id
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { selectedCard = card }
-                        .testTag("digital_card_item_${card.id}"),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (isSelected) card.primaryColor.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surface
-                    ),
-                    border = if (isSelected) androidx.compose.foundation.BorderStroke(2.dp, card.primaryColor) else null
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.SportsEsports,
-                                contentDescription = null,
-                                tint = card.primaryColor
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Text(
-                                    text = card.nameAr,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 15.sp,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Text(
-                                    text = "الفئة: ${card.valueLabel}",
-                                    fontSize = 12.sp,
-                                    color = Color.Gray
-                                )
-                            }
-                        }
-
-                        Text(
-                            text = "${card.priceYer.toInt()} ريال",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp,
-                            color = card.primaryColor
-                        )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = {
+                    when (currentStep) {
+                        DigitalCardsStep.SELECT_CARD -> onBack()
+                        DigitalCardsStep.ENTER_DETAILS -> currentStep = DigitalCardsStep.SELECT_CARD
+                        DigitalCardsStep.CONFIRMATION -> currentStep = DigitalCardsStep.ENTER_DETAILS
                     }
+                }) {
+                    Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "رجوع")
+                }
+                Column {
+                    Text(
+                        text = "الكروت الرقمية والألعاب",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = when (currentStep) {
+                            DigitalCardsStep.SELECT_CARD -> "خطوة 1: اختر نوع البطاقة"
+                            DigitalCardsStep.ENTER_DETAILS -> "خطوة 2: أدخل معرف اللاعب"
+                            DigitalCardsStep.CONFIRMATION -> "خطوة 3: مراجعة الشراء"
+                        },
+                        fontSize = 12.sp,
+                        color = PrimaryBlue
+                    )
                 }
             }
         }
 
-        // Player ID / Target Card Number Input
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        // Progress Indicator
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp, bottom = 4.dp),
+            horizontalArrangement = Arrangement.Center
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = "معرف اللاعب (Player ID) أو رقم العميل:",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp
-                )
-                OutlinedTextField(
-                    value = playerId,
-                    onValueChange = { playerId = it },
+            DigitalCardsStep.entries.forEach { step ->
+                val isCompleted = step.ordinal < currentStep.ordinal
+                val isCurrent = step == currentStep
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("card_player_id_input"),
-                    singleLine = true,
-                    placeholder = { Text("أدخل Player ID مثل 5198240182") },
-                    leadingIcon = { Icon(imageVector = Icons.Default.CreditCard, contentDescription = null, tint = selectedCard.primaryColor) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    shape = RoundedCornerShape(14.dp)
+                        .padding(horizontal = 4.dp)
+                        .height(4.dp)
+                        .width(60.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (isCurrent) PrimaryBlue 
+                            else if (isCompleted) PrimaryBlue.copy(alpha = 0.4f) 
+                            else Color.Gray.copy(alpha = 0.2f)
+                        )
                 )
             }
         }
 
-        val generatedVoucherCode = "PIN-" + (1000..9999).random() + "-" + (1000..9999).random()
-
-        Button(
-            onClick = {
-                onSubmitCardPurchase(
-                    PendingTransaction(
-                        serviceType = ServiceType.DIGITAL_CARD,
-                        serviceName = "كرت ${selectedCard.nameAr} - ${selectedCard.valueLabel}",
-                        providerCategory = selectedCard.nameAr,
-                        targetNumber = playerId.ifBlank { "شحن كود مباشر" },
-                        amount = selectedCard.priceYer,
-                        cost = selectedCard.priceYer * 0.99,
-                        digitalCode = generatedVoucherCode,
-                        notes = "كود البطاقة المولد: $generatedVoucherCode"
-                    )
-                )
-            },
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(54.dp)
-                .testTag("submit_card_purchase_button"),
-            colors = ButtonDefaults.buttonColors(containerColor = selectedCard.primaryColor),
-            shape = RoundedCornerShape(16.dp)
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = "شراء الكرت وتوليد الكود بـ PIN (${selectedCard.priceYer.toInt()} ريال)",
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold
-            )
+            when (currentStep) {
+                DigitalCardsStep.SELECT_CARD -> {
+                    Text(
+                        text = "اختر البطاقة أو اللعبة المطلوبة:",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                    cards.forEach { card ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(80.dp)
+                                .clickable {
+                                    selectedCard = card
+                                    currentStep = DigitalCardsStep.ENTER_DETAILS
+                                }
+                                .testTag("card_step_${card.id}"),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                            border = if (selectedCard.id == card.id) androidx.compose.foundation.BorderStroke(2.dp, card.primaryColor) else null
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(44.dp)
+                                            .clip(CircleShape)
+                                            .background(card.primaryColor.copy(alpha = 0.1f)),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(imageVector = Icons.Default.SportsEsports, contentDescription = null, tint = card.primaryColor, modifier = Modifier.size(24.dp))
+                                    }
+                                    Spacer(modifier = Modifier.width(16.dp))
+                                    Column {
+                                        Text(text = card.nameAr, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                                        Text(text = "الفئة: ${card.valueLabel}", fontSize = 12.sp, color = Color.Gray)
+                                    }
+                                }
+                                Text(
+                                    text = "${card.priceYer.toInt()} ريال",
+                                    fontWeight = FontWeight.Bold,
+                                    color = card.primaryColor
+                                )
+                            }
+                        }
+                    }
+                }
+
+                DigitalCardsStep.ENTER_DETAILS -> {
+                    Text(
+                        text = "أدخل بيانات المستفيد لـ ${selectedCard.nameAr}:",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    ) {
+                        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            Text(
+                                text = "يرجى إدخال معرف اللاعب (ID) أو رقم العميل بدقة لضمان وصول الشحن.",
+                                fontSize = 12.sp,
+                                color = Color.Gray
+                            )
+                            
+                            OutlinedTextField(
+                                value = playerId,
+                                onValueChange = { playerId = it },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .testTag("card_player_id_wizard"),
+                                label = { Text("ID اللاعب / رقم العميل") },
+                                placeholder = { Text("مثال: 5198240182") },
+                                leadingIcon = { Icon(imageVector = Icons.Default.CreditCard, contentDescription = null, tint = selectedCard.primaryColor) },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                shape = RoundedCornerShape(14.dp)
+                            )
+                            
+                            Spacer(modifier = Modifier.height(4.dp))
+                            
+                            Button(
+                                onClick = { currentStep = DigitalCardsStep.CONFIRMATION },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(54.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = selectedCard.primaryColor)
+                            ) {
+                                Text("الاستمرار للمراجعة", fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+
+                DigitalCardsStep.CONFIRMATION -> {
+                    Text(
+                        text = "مراجعة تفاصيل الطلب:",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(24.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    ) {
+                        Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            DetailRowItem("المنتج:", selectedCard.nameAr, selectedCard.primaryColor)
+                            DetailRowItem("الفئة:", selectedCard.valueLabel)
+                            DetailRowItem("معرف المستفيد:", if (playerId.isBlank()) "شحن كود مباشر" else playerId)
+                            DetailRowItem("سعر الشراء:", "${selectedCard.priceYer.toInt()} ريال", fontWeight = FontWeight.ExtraBold)
+                            
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = Color.Gray.copy(alpha = 0.1f))
+                            
+                            Text(
+                                text = "عند النقر على تأكيد، سيتم خصم المبلغ وتوليد كود البطاقة فوراً.",
+                                fontSize = 11.sp,
+                                color = Color.Gray,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+
+                    val generatedVoucherCode = "PIN-" + (1000..9999).random() + "-" + (1000..9999).random()
+
+                    Button(
+                        onClick = {
+                            onSubmitCardPurchase(
+                                PendingTransaction(
+                                    serviceType = ServiceType.DIGITAL_CARD,
+                                    serviceName = "كرت ${selectedCard.nameAr} - ${selectedCard.valueLabel}",
+                                    providerCategory = selectedCard.nameAr,
+                                    targetNumber = playerId.ifBlank { "شحن كود مباشر" },
+                                    amount = selectedCard.priceYer,
+                                    cost = selectedCard.priceYer * 0.99,
+                                    digitalCode = generatedVoucherCode,
+                                    notes = "كود البطاقة المولد: $generatedVoucherCode"
+                                )
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(58.dp)
+                            .testTag("submit_card_purchase_wizard"),
+                        shape = RoundedCornerShape(18.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = selectedCard.primaryColor)
+                    ) {
+                        Text("تأكيد الشراء الآن (${selectedCard.priceYer.toInt()} ريال)", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
         }
     }
 }
+
+@Composable
+fun DetailRowItem(label: String, value: String, valueColor: Color = MaterialTheme.colorScheme.onSurface, fontWeight: FontWeight = FontWeight.Bold) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(text = label, color = Color.Gray, fontSize = 14.sp)
+        Text(text = value, color = valueColor, fontWeight = fontWeight, fontSize = 15.sp)
+    }
+}
+
