@@ -2,11 +2,14 @@ package com.example.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Backspace
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Security
@@ -48,6 +52,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.example.ui.theme.ErrorRed
 import com.example.ui.theme.PrimaryBlue
 import com.example.ui.viewmodel.PendingTransaction
@@ -61,16 +66,17 @@ fun PinConfirmDialog(
     onDismiss: () -> Unit
 ) {
     var pin by remember { mutableStateOf("") }
+    val maxPinLength = 4
 
-    Dialog(onDismissRequest = { if (!isProcessing) onDismiss() }) {
-        Card(
+    Dialog(
+        onDismissRequest = { if (!isProcessing) onDismiss() },
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Surface(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .testTag("pin_confirm_dialog"),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+                .fillMaxWidth(0.95f)
+                .clip(RoundedCornerShape(32.dp)),
+            color = Color.White
         ) {
             Column(
                 modifier = Modifier
@@ -78,128 +84,79 @@ fun PinConfirmDialog(
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Header
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = onDismiss, enabled = !isProcessing) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = "إغلاق")
+                        Icon(imageVector = Icons.Default.Close, contentDescription = "إغلاق", tint = Color.Gray)
                     }
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = "تأكيد العملية بأمان",
+                            text = "تأكيد العملية",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(CircleShape)
-                                .background(PrimaryBlue.copy(alpha = 0.15f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Security,
-                                contentDescription = null,
-                                tint = PrimaryBlue,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
+                        Icon(
+                            imageVector = Icons.Default.Security,
+                            contentDescription = null,
+                            tint = PrimaryBlue,
+                            modifier = Modifier.size(20.dp)
+                        )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Summary Box
-                Surface(
+                // Summary Card
+                Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    color = MaterialTheme.colorScheme.background
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = pendingTx.serviceName,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Text(
-                                text = "خدمة: ${pendingTx.providerCategory}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.Gray
-                            )
-                        }
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(text = "رقم المستفيد / الحساب:", color = Color.Gray, fontSize = 13.sp)
-                            Text(text = pendingTx.targetNumber, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                        }
-
+                        PinConfirmDetailRow("الخدمة:", pendingTx.serviceName, isPrimary = true)
+                        PinConfirmDetailRow("رقم الحساب:", pendingTx.targetNumber)
                         if (pendingTx.subscriberName != null) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(text = "اسم المشترك:", color = Color.Gray, fontSize = 13.sp)
-                                Text(text = pendingTx.subscriberName, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
-                            }
+                            PinConfirmDetailRow("الاسم:", pendingTx.subscriberName)
                         }
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(text = "المبلغ المطلوب:", color = Color.Gray, fontSize = 13.sp)
-                            Text(
-                                text = "${pendingTx.amount} ريال يمني",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 15.sp,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
+                        PinConfirmDetailRow("المبلغ:", "${pendingTx.amount} ريال", isBold = true)
                     }
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 Text(
-                    text = "أدخل رمز PIN السريع (4 أرقام):",
+                    text = "أدخل رمز PIN لتأكيد الخصم",
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = Color.Gray
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                OutlinedTextField(
-                    value = pin,
-                    onValueChange = { if (it.length <= 6) pin = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("pin_input_field"),
-                    singleLine = true,
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                    placeholder = { Text("• • • •", textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) },
-                    leadingIcon = { Icon(imageVector = Icons.Default.Lock, contentDescription = null) },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = PrimaryBlue,
-                        unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f)
-                    ),
-                    shape = RoundedCornerShape(14.dp)
-                )
+                // PIN Indicators
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    repeat(maxPinLength) { index ->
+                        val isFilled = index < pin.length
+                        Box(
+                            modifier = Modifier
+                                .size(14.dp)
+                                .clip(CircleShape)
+                                .background(if (isFilled) PrimaryBlue else Color.LightGray.copy(alpha = 0.5f))
+                        )
+                    }
+                }
 
                 AnimatedVisibility(visible = errorMessage != null) {
                     Text(
@@ -207,40 +164,94 @@ fun PinConfirmDialog(
                         color = ErrorRed,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.SemiBold,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier.padding(top = 16.dp)
                     )
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
-                Button(
-                    onClick = { if (pin.isNotEmpty()) onConfirmPin(pin) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp)
-                        .testTag("confirm_pin_button"),
-                    enabled = pin.length >= 4 && !isProcessing,
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
-                    shape = RoundedCornerShape(14.dp)
-                ) {
-                    if (isProcessing) {
-                        CircularProgressIndicator(
-                            color = Color.White,
-                            modifier = Modifier.size(24.dp),
-                            strokeWidth = 2.dp
+                if (isProcessing) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator(color = PrimaryBlue, strokeWidth = 3.dp)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("جاري معالجة الطلب...", color = PrimaryBlue, fontWeight = FontWeight.Bold)
+                    }
+                } else {
+                    // Numeric Pad for Dialog
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        val buttons = listOf(
+                            listOf("1", "2", "3"),
+                            listOf("4", "5", "6"),
+                            listOf("7", "8", "9"),
+                            listOf(null, "0", "back")
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("جاري التنفيذ والخصم...")
-                    } else {
-                        Text(
-                            text = "تأكيد الخصم والدفع",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+
+                        buttons.forEach { row ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly
+                            ) {
+                                row.forEach { char ->
+                                    when (char) {
+                                        null -> Spacer(modifier = Modifier.size(60.dp))
+                                        "back" -> {
+                                            IconButton(
+                                                onClick = { if (pin.isNotEmpty()) pin = pin.dropLast(1) },
+                                                modifier = Modifier.size(60.dp)
+                                            ) {
+                                                Icon(Icons.Default.Backspace, contentDescription = "مسح", tint = Color.DarkGray)
+                                            }
+                                        }
+                                        else -> {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(60.dp)
+                                                    .clip(CircleShape)
+                                                    .clickable {
+                                                        if (pin.length < maxPinLength) {
+                                                            pin += char
+                                                            if (pin.length == maxPinLength) {
+                                                                onConfirmPin(pin)
+                                                            }
+                                                        }
+                                                    },
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = char,
+                                                    fontSize = 24.sp,
+                                                    fontWeight = FontWeight.SemiBold
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
     }
 }
+
+@Composable
+private fun PinConfirmDetailRow(label: String, value: String, isPrimary: Boolean = false, isBold: Boolean = false) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, color = Color.Gray, fontSize = 13.sp)
+        Text(
+            text = value,
+            fontWeight = if (isBold || isPrimary) FontWeight.Bold else FontWeight.Medium,
+            fontSize = if (isPrimary) 14.sp else 13.sp,
+            color = if (isPrimary) PrimaryBlue else Color.Black
+        )
+    }
+}
+
