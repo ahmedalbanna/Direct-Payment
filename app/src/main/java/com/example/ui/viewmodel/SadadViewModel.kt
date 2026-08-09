@@ -196,6 +196,7 @@ class SadadViewModel(application: Application) : AndroidViewModel(application) {
                     _pendingTx.value = null
                     _receiptTx.value = result.transaction
                     _toastMessage.value = "تمت العملية بنجاح! تم الخصم وطباعة السند."
+                    _activeTab.value = MainTab.DASHBOARD
                 }
                 is TransactionResult.RefundedFailure -> {
                     _pendingTx.value = null

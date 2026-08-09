@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ui.viewmodel.MainTab
 import com.example.ui.viewmodel.SadadViewModel
+import com.example.ui.viewmodel.PendingTransaction
 
 @Composable
 fun MainScreen(viewModel: SadadViewModel) {
