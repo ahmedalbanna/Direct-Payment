@@ -157,7 +157,7 @@ fun RechargeScreen(
                                 .testTag("network_step_${network.id}"),
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                            border = if (selectedNetwork.id == network.id) androidx.compose.foundation.BorderStroke(2.dp, network.primaryColor) else null
+                            border = if (selectedNetwork.id == network.id) androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
                         ) {
                             Row(
                                 modifier = Modifier
@@ -171,12 +171,12 @@ fun RechargeScreen(
                                         modifier = Modifier
                                             .size(48.dp)
                                             .clip(CircleShape)
-                                            .background(network.primaryColor.copy(alpha = 0.1f)),
+                                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
                                             text = network.nameAr.take(1),
-                                            color = network.primaryColor,
+                                            color = MaterialTheme.colorScheme.primary,
                                             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                                         )
                                     }
@@ -194,7 +194,7 @@ fun RechargeScreen(
                                     }
                                 }
                                 if (selectedNetwork.id == network.id) {
-                                    Icon(imageVector = Icons.Default.Check, contentDescription = null, tint = network.primaryColor)
+                                    Icon(imageVector = Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                                 }
                             }
                         }
@@ -226,7 +226,7 @@ fun RechargeScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        border = if (isNetworkDetected) androidx.compose.foundation.BorderStroke(1.dp, selectedNetwork.primaryColor.copy(alpha = 0.5f)) else null
+                        border = if (isNetworkDetected) androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)) else null
                     ) {
                         Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                             OutlinedTextField(
@@ -246,7 +246,7 @@ fun RechargeScreen(
                                     Icon(
                                         imageVector = Icons.Default.PhonelinkRing, 
                                         contentDescription = null, 
-                                        tint = if (isNetworkDetected) selectedNetwork.primaryColor else MaterialTheme.colorScheme.outline
+                                        tint = if (isNetworkDetected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
                                     )
                                 },
                                 trailingIcon = if (isNetworkDetected) {
@@ -254,13 +254,13 @@ fun RechargeScreen(
                                         Surface(
                                             modifier = Modifier.padding(end = 8.dp),
                                             shape = CircleShape,
-                                            color = selectedNetwork.primaryColor.copy(alpha = 0.1f)
+                                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                                         ) {
                                             Text(
                                                 text = selectedNetwork.nameAr,
                                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                                 style = MaterialTheme.typography.labelSmall,
-                                                color = selectedNetwork.primaryColor,
+                                                color = MaterialTheme.colorScheme.primary,
                                                 fontWeight = FontWeight.Bold
                                             )
                                         }
@@ -269,8 +269,8 @@ fun RechargeScreen(
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                                 shape = RoundedCornerShape(14.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = if (isNetworkDetected) selectedNetwork.primaryColor else MaterialTheme.colorScheme.primary,
-                                    unfocusedBorderColor = if (isNetworkDetected) selectedNetwork.primaryColor.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outline
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedBorderColor = if (isNetworkDetected) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outline
                                 )
                             )
 
@@ -339,7 +339,7 @@ fun RechargeScreen(
                             modifier = Modifier.weight(1f),
                             title = "رصيد فوري",
                             icon = Icons.Default.AddCard,
-                            color = selectedNetwork.primaryColor,
+                            color = MaterialTheme.colorScheme.primary,
                             onClick = {
                                 serviceType = RechargeServiceType.DIRECT
                                 currentStep = RechargeStep.ENTER_PHONE
@@ -349,7 +349,7 @@ fun RechargeScreen(
                             modifier = Modifier.weight(1f),
                             title = "اشتراك باقة",
                             icon = Icons.Default.Dataset,
-                            color = SuccessGreen,
+                            color = MaterialTheme.colorScheme.secondary,
                             onClick = {
                                 serviceType = RechargeServiceType.PACKAGE
                                 currentStep = RechargeStep.ENTER_PHONE
@@ -406,7 +406,7 @@ fun RechargeScreen(
                         modifier = Modifier.fillMaxWidth().height(54.dp),
                         enabled = amountText.isNotEmpty(),
                         shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = selectedNetwork.primaryColor)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         Text("الاستمرار للاستعلام", fontWeight = FontWeight.Bold)
                     }
@@ -424,7 +424,7 @@ fun RechargeScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        CircularProgressIndicator(color = selectedNetwork.primaryColor, strokeWidth = 3.dp)
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary, strokeWidth = 3.dp)
                         Spacer(modifier = Modifier.height(24.dp))
                         Text(
                             text = "جاري الاستعلام عن الرقم $phoneNumber",
@@ -457,9 +457,9 @@ fun RechargeScreen(
                             },
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = if (selectedPackage == null) selectedNetwork.primaryColor.copy(alpha = 0.05f) else MaterialTheme.colorScheme.surface
+                            containerColor = if (selectedPackage == null) MaterialTheme.colorScheme.primary.copy(alpha = 0.05f) else MaterialTheme.colorScheme.surface
                         ),
-                        border = if (selectedPackage == null) androidx.compose.foundation.BorderStroke(2.dp, selectedNetwork.primaryColor) else null
+                        border = if (selectedPackage == null) androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
@@ -496,9 +496,9 @@ fun RechargeScreen(
                                 },
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = if (selectedPackage?.id == pkg.id) selectedNetwork.primaryColor.copy(alpha = 0.05f) else MaterialTheme.colorScheme.surface
+                                containerColor = if (selectedPackage?.id == pkg.id) MaterialTheme.colorScheme.primary.copy(alpha = 0.05f) else MaterialTheme.colorScheme.surface
                             ),
-                            border = if (selectedPackage?.id == pkg.id) androidx.compose.foundation.BorderStroke(2.dp, selectedNetwork.primaryColor) else null
+                            border = if (selectedPackage?.id == pkg.id) androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
                         ) {
                             Row(
                                 modifier = Modifier
@@ -520,7 +520,7 @@ fun RechargeScreen(
                                 }
                                 Text(
                                     text = "${pkg.priceYer.toInt()} ريال",
-                                    color = selectedNetwork.primaryColor,
+                                    color = MaterialTheme.colorScheme.primary,
                                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                                 )
                             }
@@ -534,7 +534,7 @@ fun RechargeScreen(
                             .height(54.dp),
                         enabled = amountText.toDoubleOrNull() ?: 0.0 > 0,
                         shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = selectedNetwork.primaryColor)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         Text("الاستمرار للاستعلام", fontWeight = FontWeight.Bold)
                     }
@@ -555,24 +555,24 @@ fun RechargeScreen(
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                     ) {
                         Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            DetailRow("الشبكة:", selectedNetwork.nameAr, selectedNetwork.primaryColor)
+                            DetailRow("الشبكة:", selectedNetwork.nameAr, MaterialTheme.colorScheme.primary)
                             DetailRow("رقم الهاتف:", phoneNumber)
                             DetailRow("نوع الخدمة:", if (serviceType == RechargeServiceType.DIRECT) "رصيد فوري" else "اشتراك باقة")
                             if (serviceType == RechargeServiceType.PACKAGE) {
                                 DetailRow("الباقة:", selectedPackage?.titleAr ?: "")
                             }
                             
-                            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = Color.LightGray.copy(alpha = 0.3f))
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
                             
                             DetailRow("مبلغ العملية:", "$baseAmount ريال")
                             if (debtAmount > 0) {
-                                DetailRow("السلفة السابقة:", "$debtAmount ريال", valueColor = ErrorRed)
+                                DetailRow("السلفة السابقة:", "$debtAmount ريال", valueColor = MaterialTheme.colorScheme.error)
                             }
                             
                             DetailRow(
                                 label = "الإجمالي المطلوب خصمه:", 
                                 value = "$totalAmount ريال",
-                                valueColor = selectedNetwork.primaryColor,
+                                valueColor = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.ExtraBold
                             )
                         }
@@ -597,7 +597,7 @@ fun RechargeScreen(
                             .height(58.dp)
                             .testTag("submit_recharge_button_wizard"),
                         shape = RoundedCornerShape(18.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = selectedNetwork.primaryColor)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         Text(
                             "تأكيد العملية الآن ($totalAmount ريال)",

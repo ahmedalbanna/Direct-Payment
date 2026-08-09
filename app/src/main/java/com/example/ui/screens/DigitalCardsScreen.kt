@@ -141,7 +141,7 @@ fun DigitalCardsScreen(
                                 .testTag("card_step_${card.id}"),
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                            border = if (selectedCard.id == card.id) androidx.compose.foundation.BorderStroke(2.dp, card.primaryColor) else null
+                            border = if (selectedCard.id == card.id) androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
                         ) {
                             Row(
                                 modifier = Modifier
@@ -155,10 +155,10 @@ fun DigitalCardsScreen(
                                         modifier = Modifier
                                             .size(44.dp)
                                             .clip(CircleShape)
-                                            .background(card.primaryColor.copy(alpha = 0.1f)),
+                                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                                         contentAlignment = Alignment.Center
                                     ) {
-                                        Icon(imageVector = Icons.Default.SportsEsports, contentDescription = null, tint = card.primaryColor, modifier = Modifier.size(24.dp))
+                                        Icon(imageVector = Icons.Default.SportsEsports, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
                                     }
                                     Spacer(modifier = Modifier.width(16.dp))
                                     Column {
@@ -176,7 +176,7 @@ fun DigitalCardsScreen(
                                 Text(
                                     text = "${card.priceYer.toInt()} ريال",
                                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                                    color = card.primaryColor
+                                    color = MaterialTheme.colorScheme.primary
                                 )
                             }
                         }
@@ -211,7 +211,7 @@ fun DigitalCardsScreen(
                                     .testTag("card_player_id_wizard"),
                                 label = { Text("ID اللاعب / رقم العميل") },
                                 placeholder = { Text("مثال: 5198240182") },
-                                leadingIcon = { Icon(imageVector = Icons.Default.CreditCard, contentDescription = null, tint = selectedCard.primaryColor) },
+                                leadingIcon = { Icon(imageVector = Icons.Default.CreditCard, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 shape = RoundedCornerShape(14.dp)
                             )
@@ -224,7 +224,7 @@ fun DigitalCardsScreen(
                                     .fillMaxWidth()
                                     .height(54.dp),
                                 shape = RoundedCornerShape(16.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = selectedCard.primaryColor)
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                             ) {
                                 Text("الاستمرار للمراجعة", fontWeight = FontWeight.Bold)
                             }
@@ -247,7 +247,7 @@ fun DigitalCardsScreen(
                             modifier = Modifier.padding(24.dp),
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            DetailRowItem("المنتج:", selectedCard.nameAr, selectedCard.primaryColor)
+                            DetailRowItem("المنتج:", selectedCard.nameAr, MaterialTheme.colorScheme.primary)
                             DetailRowItem("الفئة:", selectedCard.valueLabel)
                             DetailRowItem(
                                 "معرف المستفيد:",
@@ -296,7 +296,7 @@ fun DigitalCardsScreen(
                             .height(58.dp)
                             .testTag("submit_card_purchase_wizard"),
                         shape = RoundedCornerShape(18.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = selectedCard.primaryColor)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         Text(
                             "تأكيد الشراء الآن (${selectedCard.priceYer.toInt()} ريال)",

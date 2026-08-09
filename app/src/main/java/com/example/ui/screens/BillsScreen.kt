@@ -177,14 +177,14 @@ fun BillsScreen(
                                 },
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                            border = if (isSelected) androidx.compose.foundation.BorderStroke(2.dp, service.primaryColor) else null
+                            border = if (isSelected) androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Box(
-                                    modifier = Modifier.size(40.dp).clip(CircleShape).background(service.primaryColor.copy(alpha = 0.1f)),
+                                    modifier = Modifier.size(40.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
@@ -194,7 +194,7 @@ fun BillsScreen(
                                             else -> Icons.Default.ReceiptLong
                                         },
                                         contentDescription = null,
-                                        tint = service.primaryColor,
+                                        tint = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
@@ -207,7 +207,7 @@ fun BillsScreen(
                                 Icon(
                                     imageVector = Icons.Default.CheckCircle,
                                     contentDescription = null,
-                                    tint = if (isSelected) service.primaryColor else Color.Transparent
+                                    tint = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
                                 )
                             }
                         }
@@ -234,7 +234,7 @@ fun BillsScreen(
                                 },
                                 modifier = Modifier.fillMaxWidth().testTag("bill_account_input_wizard"),
                                 label = { Text("رقم الحساب / الهاتف الثابت") },
-                                leadingIcon = { Icon(imageVector = iconForCategory, contentDescription = null, tint = selectedService.primaryColor) },
+                                leadingIcon = { Icon(imageVector = iconForCategory, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 shape = RoundedCornerShape(14.dp)
                             )
@@ -247,7 +247,7 @@ fun BillsScreen(
                                     .testTag("inquire_bill_button_wizard"),
                                 enabled = accountId.length >= 3 && !isInquiring,
                                 shape = RoundedCornerShape(16.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = selectedService.primaryColor)
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                             ) {
                                 if (isInquiring) {
                                     CircularProgressIndicator(
@@ -359,7 +359,7 @@ fun BillsScreen(
                             .testTag("submit_bill_pay_button_wizard"),
                         enabled = parsedAmount > 0,
                         shape = RoundedCornerShape(18.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = selectedService.primaryColor)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         Text(
                             "تأكيد السداد الآن ($parsedAmount ريال)",
